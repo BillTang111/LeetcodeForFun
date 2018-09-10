@@ -780,37 +780,645 @@ public class BitTigerTop100 {
 	 * @return
 	 */
 	public int firstMissingPositive(int[] nums) {
-
-		int i = 0, n = nums.length;
-		while (i < n) {
-	        // If the current value is in the range of (0,length) and it's not at its correct position, 
-	        // swap it to its correct position.
-	        // Else just continue;
-			if (nums[i] >= 0 && nums[i] < n && nums[nums[i]] != nums[i])
-				swap(nums, i, nums[i]);
-			else
+		//a smart way to use while loop: increase i only when needed (unlike for loop)
+		int i=0, n=nums.length;
+		while(i<n) { //sort array in place
+			// If the current value is in the range of (0,length) and it's not at its correct position, 
+			// swap it to its correct position.
+			// Else just continue;
+			System.out.println("the nums is"+Arrays.toString(nums));
+			if(nums[i] >= 0 && nums[i]<n && nums[nums[i]]!=nums[i]) { //repair:java.lang.ArrayIndexOutOfBoundsException
+				swap(nums, nums[i],i);
+			}else {
 				i++;
+			}
 		}
-		int k = 1;
+		int j=1; //start from position 1 (smallest positive integer)
+		while(j<n && nums[j]==j ) {
+			//    		System.out.println("the j is"+j);
+			j++;
+		}
 
-	    // Check from k=1 to see whether each index and value can be corresponding.
-		while (k < n && nums[k] == k)
-			k++;
-
-	    // If it breaks because of empty array or reaching the end. K must be the first missing number.
-		if (n == 0 || k < n)
-			return k;
-		else   // If k is hiding at position 0, K+1 is the number. It is either when array is [0], or [1].
-			return nums[0] == k ? k + 1 : k;
+		// If it breaks because of empty array or reaching the end. K must be the first missing number.
+		if (n == 0 || j < n) {
+			return j;
+		}else {
+			// If k is hiding at position 0, K+1 is the number. It is either when array is [0], or [1], chains.
+			return (nums[0]==j) ? j+1 : j;
+		}
 
 	}
 
-	private void swap(int[] nums, int i, int j) {
-		int temp = nums[i];
-		nums[i] = nums[j];
-		nums[j] = temp;
+	private void swap(int[] nums, int old_num, int pos) {
+		int temp = nums[pos];
+		nums[pos]=nums[old_num];
+		nums[old_num] = old_num; //key for this problem
 	}
+
+	/**
+	 * 43. Multiply Strings
+	 * @param num1
+	 * @param num2
+	 * @return
+	 */
+	public String multiply(String num1, String num2) {
+		int n1=num1.length(), n2=num2.length();
+		int[] result = new int[n1+n2];
+		System.out.println(Arrays.toString(result) );
+		for(int i=n1-1; i>=0;i--) {
+			for(int j=n2-1; j>=0;j--) {
+				int multip = (num1.charAt(i) -'0') * (num2.charAt(j) -'0');
+				int carry = i+j;
+				int base = i+j+1; //here: to use the formula "i x j = [i+j,i+j+1]"
+				int sum = result[base] + multip; //the idea of "carry" is really like "tail recursive"
+				result[base] = sum%10; result[carry] += sum/10;
+			}
+		}
+		System.out.println(Arrays.toString(result) );
+		//build string
+		StringBuilder sb = new StringBuilder();
+		for (int digit : result) {
+			if(sb.length()==0 && digit==0) { //remove 0 in the front
+				continue;
+			}
+			sb.append(digit);
+		}
+		return (sb.length()==0)? "0" : sb.toString();
+	}
+
+	/**
+	 * 49. Group Anagrams
+	 * @param strs
+	 * @return
+	 * intuition1: Two strings are anagrams if and only if their sorted strings are equal.
+	 * intuition2: Two strings are anagrams if and only if their character counts
+	 */
+
+	public List<List<String>> groupAnagrams(String[] strs) {
+
+
+		return null;
+
+	}
+
+	/*
+	 * iPihone drop DP problem
+	 */
+	public int leastDrop(int iPhone, int floor) {
+		int [][] min_drops = new int[iPhone+1][floor+1]; 
+		//base case: 
+		for(int m=0; m<iPhone+1; m++) {
+			min_drops[m][0]=0; //no floor requires no drop
+			min_drops[m][1]=1; //one floor requires one drop
+		}
+
+		for(int n=0; n<floor+1; n++) {
+			min_drops[0][n]=0; //no iPhone, no drop
+			min_drops[1][n]=n; //one iPhone, brute force search
+		}
+		//general case: 
+		for(int m=2; m<iPhone+1; m++) {
+			for(int n=2; n<floor+1; n++) {
+				min_drops[m][n]=Integer.MAX_VALUE;
+				for(int k=1; k<n+1; k++) {
+					//iPhone breaks at floor k
+					int iPhoneBreak = min_drops[m-1] [k-1];
+					//iPhone not breaks at floor k
+					int iPhoneNotBreak = min_drops[m] [n-k];
+					//formula: min_drops(m, n)= Min(Max(min_drops(m, n-i), min_drops(m-1, i-1)) + 1)
+					int temp = Math.max(iPhoneBreak, iPhoneNotBreak)+1;
+					min_drops[m][n] = Math.min(temp, min_drops[m][n]);
+				}
+			}
+		}
+
+		return min_drops[iPhone][floor];
+	}
+
+	/*
+	 * 53. Maximum Subarray
+	 * DP: For the current entry, add previous sum or not
+	 * formula: max = Max(max,Max(nums[i], nums[i]+maxCur)) 
+	 */
+	public int maxSubArray(int[] nums) {
+		if(nums==null || nums.length==0) {
+			return 0;
+		}
+
+		int maxCur = nums[0], max = nums[0]; //initialize at 0 entry; starting loop from 1
+		for (int i=1; i<nums.length;i++) { 
+			maxCur=Math.max(nums[i], nums[i]+maxCur); //DP: add maxCur (previous sum) or not
+			max= Math.max(max, maxCur);
+		}
+		return max;
+	}
+
+	/***
+	 * 54. Spiral Matrix
+	 * Given a matrix of m x n elements (m rows, n columns), return all elements of the matrix in spiral order.
+	 * @param matrix
+	 * @return
+	 */
+	public List<Integer> spiralOrder(int[][] matrix) {
+		List<Integer> result = new ArrayList<Integer>();
+		if (matrix==null || matrix.length==0 || matrix[0].length==0) return result;
+		//initialize four pointers
+		int top = 0, bot = matrix.length-1, left = 0, right=matrix[0].length-1;
+		//loop till no longer able to circle
+		while(left<right && top<bot) {
+			for(int i=left; i<right; i++) result.add(matrix[top][i]);
+			for(int i=top; i<bot; i++) result.add(matrix[i][right]);
+			for(int i=right; i>left;i--) result.add(matrix[bot][i]);
+			for(int i=bot; i>top; i--) result.add(matrix[i][left]);
+			left++; right--; top++; bot--;
+		}
+		//3 conditions left
+		if(left==right) {	//top<bot
+			for(int i=top; i<=bot; i++) {
+				result.add(matrix[i][right]);
+			}
+		}else if (top==bot) {		//top==bot
+			for(int i=left; i<=right; i++) {
+				result.add(matrix[top][i]);
+			}
+		}
+		//else (we do nothing)
+		return result; 
+	}
+
+	/**
+	 * 59. Spiral Matrix II
+	 * Given a positive integer n, generate a square matrix filled with elements from 1 to n2 in spiral order.
+	 */
+	public int[][] generateMatrix(int n) {
+		int[][] matr = new int[n][n];
+		int num = 1;
+
+		//4 pointers
+		int row_start = 0;
+		int row_end = n-1;
+		int col_start = 0;
+		int col_end = n-1;
+
+		//loop to build matrix ("=" for inner part of matrix)
+		while(row_start <= row_end && col_start <=col_end) {
+			for(int i = col_start; i <= col_end; i++) {
+				matr[row_start][i] = num ++; //update result
+			}
+			row_start ++; //update pointer
+			for(int j = row_start; j<= row_end; j++) {
+				matr[j][col_end] = num++;
+			}
+			col_end --; //update pointer
+			for(int i=col_end; i>=col_start; i-- ) {
+				matr[row_end][i] = num ++;
+			}
+			row_end --; 
+			for(int j=row_end; j>=row_start; j--) {
+				matr[j][col_start] = num++;
+			}
+			col_start ++;
+		}
+		return matr;
+	}
+
+	/**
+	 * 55: Jump Game (DP)
+	 * Given an array of non-negative integers, you are initially positioned at the first index of the array.
+	 * Each element in the array represents your maximum jump length at that position.
+	 * 
+	 * Usually, solving and fully understanding a dynamic programming problem is a 4 step process
+		Start with the recursive backtracking solution
+		Optimize by using a memoization table (top-down[3] dynamic programming)
+		Remove the need for recursion (bottom-up dynamic programming)
+		Apply final tricks to reduce the time / memory complexity
+	 */
+
+	/** https://segmentfault.com/a/1190000006121957
+	 * Version 1: backtracking O(2^n)
+	 * @param nums
+	 * @return
+	 */
+	//a recursive helper function 
+	public boolean canJumpFromPos(int position, int[] num) {
+		int len = num.length;
+		//destination reached (base case)
+		if(position == len -1) {
+			return true;
+		}
+		//backtracking(every possible cases) via recursion
+		int maxJump = Math.min(len -1, num[position]+position);
+		for (int nextPos = position+1; nextPos <=maxJump; nextPos++) {
+			if( canJumpFromPos(nextPos, num)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean canJump_backTrack(int[] nums) {
+		return canJumpFromPos(0, nums);   
+	}
+
+	/** 
+	 * Version 2: Dynamic Programming Top-down O(n^2)
+	 * Build table memo[] recording Good, Bad, Unkonwn for current index
+	 * https://leetcode.com/problems/jump-game/solution/
+	 * @param nums
+	 * @return
+	 */
+	//enables for a variable to be a set of predefined constants
+	enum Index{
+		GOOD, BAD, UNKNOWN
+	}
+
+	//DP table to be built
+	Index[] memo;
+
+	//method to build table
+	public boolean canJumpFromPos2(int position, int[] num) {
+		int len = num.length;
+		//first checks if the index is known
+		System.out.println(position);
+		if(memo[position] != Index.UNKNOWN) {
+			return memo[position]==Index.GOOD ? true : false;
+		}
+
+		//backtracking(every possible cases) via recursion while building the table
+		int maxJump = Math.min(len - 1, num[position]+position);
+		for (int nextPos = position+1; nextPos <=maxJump; nextPos++) {
+			if(canJumpFromPos2(nextPos, num)) {
+				memo[position] = Index.GOOD; //update the table
+				return true;
+			}
+		}
+		memo[position] = Index.BAD;
+		return false;
+	}
+
+	public boolean canJump2(int[] nums) {
+		//Initialize the table to be all UNKNOWN
+		//wrong: Index[] memo = new Index[nums.length];
+		// this will create a new object not shared by the other method
+		memo = new Index[nums.length];
+		for(int i=0; i<memo.length; i++) {
+			memo[i]=Index.UNKNOWN;
+		}
+		//base case: initialize the last index to be GOOD
+		memo[memo.length-1] = Index.GOOD;
+		return canJumpFromPos2(0, nums);   
+	}
+
+	/** 
+	 * Version 3: Dynamic Programming T Bottom-up -- going backward O(n^2)
+	 * eliminating recursion --> tail recursive; for-loop. 
+	 * In practice, this achieves better performance as we no longer 
+	 * have the method stack overhead and might even benefit from some caching. 
+	 * More importantly, this step opens up possibilities for future optimization. 
+	 * The recursion is usually eliminated by trying to reverse the order of the steps from the top-down approach.
+	 */
+	//22.9%
+	public boolean canJump3(int[] nums) {
+
+		//Init index table (new one)
+		Index[] table = new Index[nums.length];
+		for (int i=0; i<table.length;i++) {
+			table[i]=Index.UNKNOWN;
+		}
+		table[table.length-1] = Index.GOOD;
+
+		//looping from right to left to find if table[0]==Good
+		for(int pos=nums.length-2; pos>=0; pos--) {
+			int maxJumpPos = Math.min(nums.length-1, pos+nums[pos]);
+			for(int prob=maxJumpPos; prob>pos; prob--) {
+				if(table[prob]==Index.GOOD) {
+					table[pos]=Index.GOOD;
+					break;
+				}
+			}
+		}
+
+		return table[0]==Index.GOOD;
+	}
+
+	/** 
+	 * Version 4: Greedy
+	 */
+	public boolean canJump(int[] nums) {
+		//base case
+		if(nums.length<2) {
+			return true;
+		}
+		//loop to find reachability
+		int maxReach = 0;
+		for(int pos=0; pos<=nums.length-1 && pos<=maxReach ;pos++) {
+
+		}
+
+		return false;
+	}
+
+	/**
+	 * 45. Jump Game II (BFS)
+	 * You can assume that you can always reach the last index.
+	 * https://www.youtube.com/watch?v=r3pZd9ghqxk
+	 */
+	public int jump(int[] nums) {
+		if(nums.length<2) return 0;
+		int level=0, idx=0, cur_Max=0, next_max=0;
+		//inner for loop could have idx >cur_max --> break infinite loop 
+		while(idx <= cur_Max) {
+			//traverse current level, and update the max reach of next level
+			while(idx <= cur_Max) {
+				next_max=Math.max(next_max, nums[idx]+idx);
+				idx++;
+			}
+			level++;
+			cur_Max = next_max;
+			if(next_max>=nums.length-1) return level;
+		}
+		return 0;
+	}
+
+	/**
+	 * 56. Merge Intervals (two pointers)
+	 * sort then merge
+	 */
+	private class Interval {
+		int start;
+		int end;
+		Interval() { start = 0; end = 0; }
+		Interval(int s, int e) { start = s; end = e; }
+	}
+
+	public List<Interval> merge(List<Interval> intervals) {
+		List<Interval> res = new ArrayList<Interval>();
+		int n = intervals.size();
+		int[] start = new int[n];
+		int[] end = new int[n];
+
+		//sort start[] and end[]
+		for(int i=0; i<n;i++) {
+			start[i]=intervals.get(i).start;
+			end[i]=intervals.get(i).end;
+		}
+		Arrays.sort(start);
+		Arrays.sort(end);
+
+		// for distinct Interval, the latter one's start must > previous one's end.
+		for(int i=0, j=0; i<n; i++) { // j is the start of interval
+			if(i==n-1 || start[i+1]>end[i]) {
+				res.add(new Interval(start[j],end[i]));
+				j=i+1; //start from (previous end + 1)
+			}
+		}
+		return res;
+	}
+	
+	/**
+	 * 62. Unique Paths (DP)
+	 */
+    public int uniquePaths(int m, int n) {
+    	//base case: with this, 1ms -> 0ms
+    	if(m==0 || n==0) {
+    		return 0;
+    	}
+    	
+    	if(m==1 || n==1) {
+    		return 1;
+    	}
+    	
+    	//general case 
+    	int [][] Path = new int[m][n];
+    	
+    	for(int i=0;i<m;i++){
+    		Path[i][0] = 1; //only 1 way 
+    	}
+    	
+    	for(int j=0;j<n;j++) {
+    		Path[0][j] = 1;
+    	}
+    	
+    	for(int i=1;i<m;i++) {
+    		for(int j=1;j<n;j++) {
+    			Path[i][j]=Path[i-1][j]+Path[i][j-1];
+    		}
+    	}
+    	
+		return Path[m-1][n-1];
+    }
+    
+    /**70. Climbing Stairs
+     * 
+     */
+    //DP method
+    public int climbStairs(int n) {
+    	//base case
+    	if(n<3) return n;
+    	
+    	//general case
+    	//dp[i] = # ways to step i
+    	int[] dp = new int[n+1]; //0...n
+    	
+    	dp[0]=0;
+    	dp[1]=1;
+    	dp[2]=2;
+    	
+    	for(int i=3;i<n+1;i++) {
+    		dp[i] = dp[i-1]+dp[i-2];
+    	}
+		return dp[n];
+    }
+
+    //Fibonacci Number
+    public int climbStairs_Fibonacci(int n) {
+    	if(n<3) return n;
+    	
+    	int fst = 1;
+    	int sec = 2;
+    	int thrd = 0;
+    	
+    	for(int i=3;i<n+1; i++) {
+    		thrd = fst + sec;
+    		fst = sec;
+    		sec = thrd;
+    	}
+    	return sec;
+    }
+    
+    /**
+     * 72. Edit Distance
+     **/
+    public int minDistance(String word1, String word2) {
+    	int m = word1.length(), n = word2.length();
+    	if(m==0) return n;
+    	if(n==0) return m;
+    	
+    	//define: dp[i][j] = min cost converting first i of word1 to first j of word 2
+    	int[][] dp = new int[m+1][n+1]; //0....n or m 
+    
+    	//consider any operation from word1 to word2.
+    	for(int i=0;i<m+1;i++) {
+    		for(int j=0;j<n+1;j++) {
+    			//base case
+    			if(i == 0) {
+    				dp[0][j] = j;
+    			}else if(j == 0) {
+    				dp[i][0] = i;
+    			}else if(word1.charAt(i-1)==word2.charAt(j-1)){//word[0] ==> dp[1]
+        			//general case 
+    				dp[i][j]=dp[i-1][j-1];
+    			}else {
+    				dp[i][j] = 1 + Math.min(dp[i][j-1], Math.min(dp[i-1][j], dp[i-1][j-1]));
+    			}
+    		}
+    	}
+		return dp[m][n];
+    }
+    
+    /**
+     * 76. Minimum Window Substring
+     * GOOD summary of "sub-string" / "two pointer"
+     * https://leetcode.com/problems/minimum-window-substring/discuss/26808/Here-is-a-10-line-template-that-can-solve-most-'substring'-problems
+     * */
+    //Find t in s 
+    public String minWindow(String s, String t) {
+    	//base case
+    	if(s.length()==0||t.length()==0||s.length()<t.length()) return "";
+    	
+    	//general case
+    	char[] tArr = t.toCharArray();
+    	char[] sArr = s.toCharArray();
+    	
+    	int[] map = new int[256]; //array as map(key=char, value= count of unmatched in T)
+    	for(char c: tArr) map[c]++;
+    	
+    	int begin=0, end=0, counter=tArr.length; //counter==# of unmatched chars
+    	int minLength=Integer.MAX_VALUE, head = 0; 
+    	
+    	//move end pointer
+    	while(end<sArr.length) {
+    		if(map[sArr[end]]>0) { //do only what it is asked to do!!! (decrease counter)
+//    			map[sArr[end]]--; (can't differ normal with target chars in map)
+    			counter--;
+    		}
+    		map[sArr[end]]--;
+    		//move begin pointer when one of sub-array is found
+    		while(counter==0){
+    			int curLength = end - begin + 1;
+    			if(curLength < minLength) {
+    				minLength = curLength;
+    				head = begin;
+    			}
+    			map[sArr[begin]]++;
+                if (map[sArr[begin]] > 0) {
+                    counter++; //differ normal with target chars in map
+                }
+    			begin++;
+    		}
+    		end++;
+    	}
+    	//find s in t or not 
+		return head+minLength>sArr.length? "" : s.substring(head, head+minLength);
+    }
+    
+    /***
+     * 84. Largest Rectangle in Histogram
+     * Given n non-negative integers representing the histogram's bar height where the width of each bar is 1, 
+     * find the area of largest rectangle in the histogram.
+     * https://www.youtube.com/watch?v=KkJrGxuQtYo
+     */
+    public int largestRectangleArea(int[] heights) {
+        if(heights == null || heights.length == 0) {return 0;}
+        int largestRec = 0;
+        Stack<Integer> stack = new Stack<>();
+  
+        for(int i = 0; i < heights.length; i++){ 
+        	//pop when current height decreases (right boundary is found)
+            while(!stack.isEmpty() && heights[i] < heights[stack.peek()]){ 
+                int pos = stack.pop(); 
+                int left = stack.isEmpty() ? -1 : stack.peek(); 
+                int height = heights[pos]; 
+                largestRec = Math.max(height * (i - left - 1), largestRec);  //"i" is the current right position
+            }
+            //push everyone onto stack
+            stack.push(i); 
+        }
+        
+        //deal with the final ones
+        while(!stack.isEmpty()){
+            int right = heights.length;
+            int pos = stack.pop();
+            int left = stack.isEmpty() ? -1 : stack.peek();
+            largestRec = Math.max(largestRec, heights[pos] * (right - left - 1));
+        }
+        return largestRec;
+    }
+    
+    /***
+     * 89. Gray Code
+     * Given a non-negative integer n representing the total number of bits in the code, print the sequence of gray code.
+     */
+    public List<Integer> grayCode(int n) {
+    	List<Integer> res = new ArrayList<Integer>();
+    	for(int i=0; i< 1<<n; i++) {
+    		res.add(i^i>>1);
+    	}
+		return res;
+    }
+    
+    /***
+     * 91. Decode Ways (DP)
+     * Given a non-empty string containing only digits, determine the total number of ways to decode it.
+     */
+    public int numDecodings(String s) {
+    	//corner case
+    	if(s.length()==0) return 0;
+    	
+    	//general case
+    	int len = s.length();
+    	int[] dp = new int[len]; //1-D table with entry == #of ways to decode from 0 ... i
+    	dp[0]= s.charAt(0)== '0'? 0 : 1; //eg. 02 -> 0 way
+    	for(int i=1; i<len; i++) {
+    		if(dp[0]==0) break;
+
+    		//2 cases when 2 digits can combine
+    		if(s.charAt(i-1)=='1' ) {
+    			dp[i] = 1 + dp[i-1];
+    		}else if(s.charAt(i-1)=='2' && s.charAt(i)<='6') {
+    			dp[i] = 1 + dp[i-1];
+//        		System.out.println("i am here");
+
+    		}else {
+    			dp[i]++; //always legitimate by itself
+    	    	System.out.println(dp[i]);
+    		}		
+    	}
+    	return dp[len-1];
+    }
+    
+//    public int numDecodings(String s) {
+//        if (s == null || s.length() == 0) return 0;
+//        if (s.charAt(0) == '0') return 0;
+//        int n = s.length();
+//        int[] dp = new int[n + 1];
+//        dp[0] = 1;
+//        dp[1] = 1;
+//        for (int i = 1; i < n; i++) {
+//            if (s.charAt(i) != '0') {
+//                dp[i + 1] += dp[i];    
+//            }
+//            if (s.charAt(i - 1) == '1' || s.charAt(i - 1) == '2' && s.charAt(i) <= '6') {
+//                dp[i + 1] += dp[i - 1];
+//            }
+//        }
+//        return dp[n];
+//    }
+
 }
+
+
+
 
 
 
