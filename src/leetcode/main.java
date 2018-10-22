@@ -63,15 +63,7 @@ public class main {
 //		String s = "102";
 //		int res = pt.numDecodings(s);
 //		System.out.println(res);
-		
-		
-		//------- Java Review
-//		JavaRecursive jr = new JavaRecursive();
-//		String s = "xyxyxyxy";
-//		String a = jr.deduplicate(s);
-//		System.out.println(a);
-        int[] b= {4, 3, 8, 7, 8, 5, 1};
-        int j= SearchAndSort.partition(b, 0, 6);
-		System.out.println(j);
+
+
 	}
 }

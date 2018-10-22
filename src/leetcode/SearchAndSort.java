@@ -82,9 +82,11 @@ public class SearchAndSort {
 		} 
 	}
 	
-    /** Sort b[h..k] using partitioning O(n^2)*/
+    /** Sort b[h..k] using partitioning O(n^2)  */ 
+	//O(n*log n) on average; fewer swap and comparisons
+	//method: partitioning (pivot)
     public static void quickSort(int[] b, int h, int k) {
-    	//base case (only <2 elements)
+    	//base case (only 1 element)
     	if(k-h+1<2) return;
     	//sort current array
     	int j = partition(b, h, k);
@@ -93,7 +95,7 @@ public class SearchAndSort {
     	quickSort(b, j+1, k);
     }
     
-    /** b[h..k] has at least three elements.<br>
+    /** b[h..k] has at least two elements.<br>
     Let x be the value initially in b[h].<br>
     Permute b[h..k] and return integer j satisfying R:<br><br>
   	b[h..j-1] <= b[j] = x <= b[j+1..k] (j is the pivot)
@@ -131,6 +133,7 @@ public class SearchAndSort {
   }
     
   /** Sort b[h..k]. O(nlogn)*/
+  //method: divide and conquer
   public static void mergeSort(int[] b, int h, int k) {
 	  //base case
 	  if(k-h+1<2) return;
@@ -149,6 +152,7 @@ public class SearchAndSort {
 	public static void merge (int b[], int h, int e, int k) {
 		//loop to insert b[e+1..k]
 		for(int i=e+1; i<k+1; i++) {
+			//insertion sort 
 			int pos=i;
 			while(pos>0 && b[pos]<b[pos-1]) {
 				swap(b,pos,pos-1);

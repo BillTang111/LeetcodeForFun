@@ -486,7 +486,7 @@ public class BitTigerTop100 {
 		//base case
 		if(nums == null || nums.length ==0) return -1;
 		int left = 0, right= nums.length-1; //position of initial left and right pointers
-		//binary search to find the target value
+		
 		while(left+1 < right) {
 			//calculate mid (prevent integer overflow)
 			int mid = left + (right-left)/2;
@@ -1174,246 +1174,262 @@ public class BitTigerTop100 {
 		}
 		return res;
 	}
-	
+
 	/**
 	 * 62. Unique Paths (DP)
 	 */
-    public int uniquePaths(int m, int n) {
-    	//base case: with this, 1ms -> 0ms
-    	if(m==0 || n==0) {
-    		return 0;
-    	}
-    	
-    	if(m==1 || n==1) {
-    		return 1;
-    	}
-    	
-    	//general case 
-    	int [][] Path = new int[m][n];
-    	
-    	for(int i=0;i<m;i++){
-    		Path[i][0] = 1; //only 1 way 
-    	}
-    	
-    	for(int j=0;j<n;j++) {
-    		Path[0][j] = 1;
-    	}
-    	
-    	for(int i=1;i<m;i++) {
-    		for(int j=1;j<n;j++) {
-    			Path[i][j]=Path[i-1][j]+Path[i][j-1];
-    		}
-    	}
-    	
+	public int uniquePaths(int m, int n) {
+		//base case: with this, 1ms -> 0ms
+		if(m==0 || n==0) {
+			return 0;
+		}
+
+		if(m==1 || n==1) {
+			return 1;
+		}
+
+		//general case 
+		int [][] Path = new int[m][n];
+
+		for(int i=0;i<m;i++){
+			Path[i][0] = 1; //only 1 way 
+		}
+
+		for(int j=0;j<n;j++) {
+			Path[0][j] = 1;
+		}
+
+		for(int i=1;i<m;i++) {
+			for(int j=1;j<n;j++) {
+				Path[i][j]=Path[i-1][j]+Path[i][j-1];
+			}
+		}
+
 		return Path[m-1][n-1];
-    }
-    
-    /**70. Climbing Stairs
-     * 
-     */
-    //DP method
-    public int climbStairs(int n) {
-    	//base case
-    	if(n<3) return n;
-    	
-    	//general case
-    	//dp[i] = # ways to step i
-    	int[] dp = new int[n+1]; //0...n
-    	
-    	dp[0]=0;
-    	dp[1]=1;
-    	dp[2]=2;
-    	
-    	for(int i=3;i<n+1;i++) {
-    		dp[i] = dp[i-1]+dp[i-2];
-    	}
+	}
+
+	/**70. Climbing Stairs
+	 * 
+	 */
+	//DP method
+	public int climbStairs(int n) {
+		//base case
+		if(n<3) return n;
+
+		//general case
+		//dp[i] = # ways to step i
+		int[] dp = new int[n+1]; //0...n
+
+		dp[0]=0;
+		dp[1]=1;
+		dp[2]=2;
+
+		for(int i=3;i<n+1;i++) {
+			dp[i] = dp[i-1]+dp[i-2];
+		}
 		return dp[n];
-    }
+	}
 
-    //Fibonacci Number
-    public int climbStairs_Fibonacci(int n) {
-    	if(n<3) return n;
-    	
-    	int fst = 1;
-    	int sec = 2;
-    	int thrd = 0;
-    	
-    	for(int i=3;i<n+1; i++) {
-    		thrd = fst + sec;
-    		fst = sec;
-    		sec = thrd;
-    	}
-    	return sec;
-    }
-    
-    /**
-     * 72. Edit Distance
-     **/
-    public int minDistance(String word1, String word2) {
-    	int m = word1.length(), n = word2.length();
-    	if(m==0) return n;
-    	if(n==0) return m;
-    	
-    	//define: dp[i][j] = min cost converting first i of word1 to first j of word 2
-    	int[][] dp = new int[m+1][n+1]; //0....n or m 
-    
-    	//consider any operation from word1 to word2.
-    	for(int i=0;i<m+1;i++) {
-    		for(int j=0;j<n+1;j++) {
-    			//base case
-    			if(i == 0) {
-    				dp[0][j] = j;
-    			}else if(j == 0) {
-    				dp[i][0] = i;
-    			}else if(word1.charAt(i-1)==word2.charAt(j-1)){//word[0] ==> dp[1]
-        			//general case 
-    				dp[i][j]=dp[i-1][j-1];
-    			}else {
-    				dp[i][j] = 1 + Math.min(dp[i][j-1], Math.min(dp[i-1][j], dp[i-1][j-1]));
-    			}
-    		}
-    	}
+	//Fibonacci Number
+	public int climbStairs_Fibonacci(int n) {
+		if(n<3) return n;
+
+		int fst = 1;
+		int sec = 2;
+		int thrd = 0;
+
+		for(int i=3;i<n+1; i++) {
+			thrd = fst + sec;
+			fst = sec;
+			sec = thrd;
+		}
+		return sec;
+	}
+
+	/**
+	 * 72. Edit Distance
+	 **/
+	public int minDistance(String word1, String word2) {
+		int m = word1.length(), n = word2.length();
+		if(m==0) return n;
+		if(n==0) return m;
+
+		//define: dp[i][j] = min cost converting first i of word1 to first j of word 2
+		int[][] dp = new int[m+1][n+1]; //0....n or m 
+
+		//consider any operation from word1 to word2.
+		for(int i=0;i<m+1;i++) {
+			for(int j=0;j<n+1;j++) {
+				//base case
+				if(i == 0) {
+					dp[0][j] = j;
+				}else if(j == 0) {
+					dp[i][0] = i;
+				}else if(word1.charAt(i-1)==word2.charAt(j-1)){//word[0] ==> dp[1]
+					//general case 
+					dp[i][j]=dp[i-1][j-1];
+				}else {
+					dp[i][j] = 1 + Math.min(dp[i][j-1], Math.min(dp[i-1][j], dp[i-1][j-1]));
+				}
+			}
+		}
 		return dp[m][n];
-    }
-    
-    /**
-     * 76. Minimum Window Substring
-     * GOOD summary of "sub-string" / "two pointer"
-     * https://leetcode.com/problems/minimum-window-substring/discuss/26808/Here-is-a-10-line-template-that-can-solve-most-'substring'-problems
-     * */
-    //Find t in s 
-    public String minWindow(String s, String t) {
-    	//base case
-    	if(s.length()==0||t.length()==0||s.length()<t.length()) return "";
-    	
-    	//general case
-    	char[] tArr = t.toCharArray();
-    	char[] sArr = s.toCharArray();
-    	
-    	int[] map = new int[256]; //array as map(key=char, value= count of unmatched in T)
-    	for(char c: tArr) map[c]++;
-    	
-    	int begin=0, end=0, counter=tArr.length; //counter==# of unmatched chars
-    	int minLength=Integer.MAX_VALUE, head = 0; 
-    	
-    	//move end pointer
-    	while(end<sArr.length) {
-    		if(map[sArr[end]]>0) { //do only what it is asked to do!!! (decrease counter)
-//    			map[sArr[end]]--; (can't differ normal with target chars in map)
-    			counter--;
-    		}
-    		map[sArr[end]]--;
-    		//move begin pointer when one of sub-array is found
-    		while(counter==0){
-    			int curLength = end - begin + 1;
-    			if(curLength < minLength) {
-    				minLength = curLength;
-    				head = begin;
-    			}
-    			map[sArr[begin]]++;
-                if (map[sArr[begin]] > 0) {
-                    counter++; //differ normal with target chars in map
-                }
-    			begin++;
-    		}
-    		end++;
-    	}
-    	//find s in t or not 
+	}
+
+	/**
+	 * 76. Minimum Window Substring
+	 * GOOD summary of "sub-string" / "two pointer"
+	 * https://leetcode.com/problems/minimum-window-substring/discuss/26808/Here-is-a-10-line-template-that-can-solve-most-'substring'-problems
+	 * */
+	//Find t in s 
+	public String minWindow(String s, String t) {
+		//base case
+		if(s.length()==0||t.length()==0||s.length()<t.length()) return "";
+
+		//general case
+		char[] tArr = t.toCharArray();
+		char[] sArr = s.toCharArray();
+
+		int[] map = new int[256]; //array as map(key=char, value= count of unmatched in T)
+		for(char c: tArr) map[c]++;
+
+		int begin=0, end=0, counter=tArr.length; //counter==# of unmatched chars
+		int minLength=Integer.MAX_VALUE, head = 0; 
+
+		//move end pointer
+		while(end<sArr.length) {
+			if(map[sArr[end]]>0) { //do only what it is asked to do!!! (decrease counter)
+				//    			map[sArr[end]]--; (can't differ normal with target chars in map)
+				counter--;
+			}
+			map[sArr[end]]--;
+			//move begin pointer when one of sub-array is found
+			while(counter==0){
+				int curLength = end - begin + 1;
+				if(curLength < minLength) {
+					minLength = curLength;
+					head = begin;
+				}
+				map[sArr[begin]]++;
+				if (map[sArr[begin]] > 0) {
+					counter++; //differ normal with target chars in map
+				}
+				begin++;
+			}
+			end++;
+		}
+		//find s in t or not 
 		return head+minLength>sArr.length? "" : s.substring(head, head+minLength);
-    }
-    
-    /***
-     * 84. Largest Rectangle in Histogram
-     * Given n non-negative integers representing the histogram's bar height where the width of each bar is 1, 
-     * find the area of largest rectangle in the histogram.
-     * https://www.youtube.com/watch?v=KkJrGxuQtYo
-     */
-    public int largestRectangleArea(int[] heights) {
-        if(heights == null || heights.length == 0) {return 0;}
-        int largestRec = 0;
-        Stack<Integer> stack = new Stack<>();
-  
-        for(int i = 0; i < heights.length; i++){ 
-        	//pop when current height decreases (right boundary is found)
-            while(!stack.isEmpty() && heights[i] < heights[stack.peek()]){ 
-                int pos = stack.pop(); 
-                int left = stack.isEmpty() ? -1 : stack.peek(); 
-                int height = heights[pos]; 
-                largestRec = Math.max(height * (i - left - 1), largestRec);  //"i" is the current right position
-            }
-            //push everyone onto stack
-            stack.push(i); 
-        }
-        
-        //deal with the final ones
-        while(!stack.isEmpty()){
-            int right = heights.length;
-            int pos = stack.pop();
-            int left = stack.isEmpty() ? -1 : stack.peek();
-            largestRec = Math.max(largestRec, heights[pos] * (right - left - 1));
-        }
-        return largestRec;
-    }
-    
-    /***
-     * 89. Gray Code
-     * Given a non-negative integer n representing the total number of bits in the code, print the sequence of gray code.
-     */
-    public List<Integer> grayCode(int n) {
-    	List<Integer> res = new ArrayList<Integer>();
-    	for(int i=0; i< 1<<n; i++) {
-    		res.add(i^i>>1);
-    	}
+	}
+
+	/***
+	 * 84. Largest Rectangle in Histogram
+	 * Given n non-negative integers representing the histogram's bar height where the width of each bar is 1, 
+	 * find the area of largest rectangle in the histogram.
+	 * https://www.youtube.com/watch?v=KkJrGxuQtYo
+	 */
+	public int largestRectangleArea(int[] heights) {
+		if(heights == null || heights.length == 0) {return 0;}
+		int largestRec = 0;
+		Stack<Integer> stack = new Stack<>();
+
+		for(int i = 0; i < heights.length; i++){ 
+			//pop when current height decreases (right boundary is found)
+			while(!stack.isEmpty() && heights[i] < heights[stack.peek()]){ 
+				int pos = stack.pop(); 
+				int left = stack.isEmpty() ? -1 : stack.peek(); 
+				int height = heights[pos]; 
+				largestRec = Math.max(height * (i - left - 1), largestRec);  //"i" is the current right position
+			}
+			//push everyone onto stack
+			stack.push(i); 
+		}
+
+		//deal with the final ones
+		while(!stack.isEmpty()){
+			int right = heights.length;
+			int pos = stack.pop();
+			int left = stack.isEmpty() ? -1 : stack.peek();
+			largestRec = Math.max(largestRec, heights[pos] * (right - left - 1));
+		}
+		return largestRec;
+	}
+
+	/***
+	 * 89. Gray Code
+	 * Given a non-negative integer n representing the total number of bits in the code, print the sequence of gray code.
+	 */
+	public List<Integer> grayCode(int n) {
+		List<Integer> res = new ArrayList<Integer>();
+		for(int i=0; i< 1<<n; i++) {
+			res.add(i^i>>1);
+		}
 		return res;
-    }
-    
-    /***
-     * 91. Decode Ways (DP)
-     * Given a non-empty string containing only digits, determine the total number of ways to decode it.
-     */
-    public int numDecodings(String s) {
-    	//corner case
-    	if(s.length()==0) return 0;
-    	
-    	//general case
-    	int len = s.length();
-    	int[] dp = new int[len]; //1-D table with entry == #of ways to decode from 0 ... i
-    	dp[0]= s.charAt(0)== '0'? 0 : 1; //eg. 02 -> 0 way
-    	for(int i=1; i<len; i++) {
-    		if(dp[0]==0) break;
+	}
 
-    		//2 cases when 2 digits can combine
-    		if(s.charAt(i-1)=='1' ) {
-    			dp[i] = 1 + dp[i-1];
-    		}else if(s.charAt(i-1)=='2' && s.charAt(i)<='6') {
-    			dp[i] = 1 + dp[i-1];
-//        		System.out.println("i am here");
+	/***
+	 * 91. Decode Ways (DP)
+	 * Given a non-empty string containing only digits, determine the total number of ways to decode it.
+	 */
+	public int numDecodings(String s) {
+		//corner case
+		if(s.length()==0) return 0;
 
-    		}else {
-    			dp[i]++; //always legitimate by itself
-    	    	System.out.println(dp[i]);
-    		}		
-    	}
-    	return dp[len-1];
-    }
-    
-//    public int numDecodings(String s) {
-//        if (s == null || s.length() == 0) return 0;
-//        if (s.charAt(0) == '0') return 0;
-//        int n = s.length();
-//        int[] dp = new int[n + 1];
-//        dp[0] = 1;
-//        dp[1] = 1;
-//        for (int i = 1; i < n; i++) {
-//            if (s.charAt(i) != '0') {
-//                dp[i + 1] += dp[i];    
-//            }
-//            if (s.charAt(i - 1) == '1' || s.charAt(i - 1) == '2' && s.charAt(i) <= '6') {
-//                dp[i + 1] += dp[i - 1];
-//            }
-//        }
-//        return dp[n];
-//    }
+		//general case
+		int len = s.length();
+		int[] dp = new int[len]; //1-D table with entry == #of ways to decode from 0 ... i
+		dp[0]= s.charAt(0)== '0'? 0 : 1; //eg. 02 -> 0 way
+		for(int i=1; i<len; i++) {
+			if(dp[0]==0) break;
+
+			//2 cases when 2 digits can combine
+			if(s.charAt(i-1)=='1' ) {
+				dp[i] = 1 + dp[i-1];
+			}else if(s.charAt(i-1)=='2' && s.charAt(i)<='6') {
+				dp[i] = 1 + dp[i-1];
+				//        		System.out.println("i am here");
+
+			}else {
+				dp[i]++; //always legitimate by itself
+				System.out.println(dp[i]);
+			}		
+		}
+		return dp[len-1];
+	}
+
+	//94.Binary Tree Inorder Traversal
+	public List<Integer> inorderTraversal(TreeNode root) {
+		ArrayList<Integer> lst = new ArrayList<Integer>();
+		Stack<TreeNode> stack = new Stack<TreeNode>();
+
+		TreeNode cur = root;
+
+		while(cur != null || !stack.empty()) {
+			while(cur != null) {
+				stack.push(cur);
+				cur = cur.left;
+			}
+			//left
+			cur = stack.pop();
+			lst.add(cur.val);
+			cur = cur.right;
+		}
+		return lst;
+	}
+	
+	ArrayList<Integer> lst_inorderTraversal_Rec = new ArrayList<Integer>();
+	
+	public List<Integer> inorderTraversal_Rec(TreeNode root) {
+		
+		if(root!=null) {
+			inorderTraversal_Rec(root.left);
+			lst_inorderTraversal_Rec.add(root.val);
+			inorderTraversal_Rec(root.right);
+		}
+		
+		return lst_inorderTraversal_Rec;
+	}
+	
 
 }
 
