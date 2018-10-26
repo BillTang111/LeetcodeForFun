@@ -138,19 +138,44 @@ public class BitTigerTop100 {
 	}
 
 	/**
-	 * Q4: Find the median of the two sorted arrays. The overall run time complexity should be O(log (m+n)).
+	 * Q4: Find the median of the two sorted arrays. O(log (m+n)).
 	 * BInary search; O(log MIN(m,n))    https://www.youtube.com/watch?v=KB9IcSCDQ9k
-	 * k = 合并后中位数 = 左边元素的个数 = (n1+n2+1)/2
-	 * m1 = 左边使用元素的个数
 	 */
-	public double findMedianSortedArrays(int[] nums1, int[] nums2) {
-		//    	[l, r) 左闭右开，所以r不能=m-1。循坏条件是 l < r，但最后 l 可能等于 r， 表示第一个数组所有的元素都要使用
-		//    	“<”: not enough large number on the left side
+	   public double findMedianSortedArrays(int[] A, int[] B) {
+	        int m = A.length;
+	        int n = B.length;
+	        if (m > n) { // to ensure m<=n
+	            int[] temp = A; A = B; B = temp;
+	            int tmp = m; m = n; n = tmp;
+	        }
+			//halfLen = 合并后 左边元素的'个数'； 左中位数下标 = (halfLen-1)
+	        int iMin = 0, iMax = m, halfLen = (m + n + 1) / 2;
+	        while (iMin <= iMax) { // 2 pointers to determine A 左边个数
+	            int i = (iMin + iMax) / 2; //A 左边个数
+	            int j = halfLen - i; //B 左边个数
+	            if (i < iMax && B[j-1] > A[i]){
+	                iMin = i + 1; // i is too small
+	            }
+	            else if (i > iMin && A[i-1] > B[j]) {
+	                iMax = i - 1; // i is too big
+	            }
+	            else { // i is perfect
+	                int maxLeft = 0;
+	                if (i == 0) { maxLeft = B[j-1]; }  //A 左边不用。 用B左边 eg. [/ 7] [1 '2' 3]
+	                else if (j == 0) { maxLeft = A[i-1]; } //B 左边不用 
+	                else { maxLeft = Math.max(A[i-1], B[j-1]); } //[1 2 '3'] ['4' / 5 6 7]
+	                if ( (m + n) % 2 == 1 ) { return maxLeft; } //odd case
 
+	                int minRight = 0;
+	                if (i == m) { minRight = B[j]; } 
+	                else if (j == n) { minRight = A[i]; }
+	                else { minRight = Math.min(B[j], A[i]); } //eg. [/ '7'] [1 '2' '3']
 
-		return 0;
-
-	}
+	                return (maxLeft + minRight) / 2.0;
+	            }
+	        }
+	        return 0.0;
+	    }
 
 	/**
 	 * Q5: Longest Palindromic Substring
@@ -186,6 +211,87 @@ public class BitTigerTop100 {
 		}
 		return res;
 	}
+	
+	//	7 Reverse Integer    
+    public int reverse(int x) {
+    	//cannot do this: "roll-over" -- eg: bound=100; input=101; (bound)input = -99
+//        if(x == 0 || x>Math.pow(2, 32) || x<-1*Math.pow(2,32)+1) return 0;
+        int result = 0;
+        while(x != 0) {
+        	int tail = x % 10;
+        	int newResult = result*10 + tail; //this may overflow
+        	//overflow check !!!
+        	if(result != (newResult - tail)/10) return 0;
+        	x /= 10;
+        	result = newResult;
+        }
+    	return result;
+    }
+    
+    // 9 Palindrome Number 
+    //method 1: call reverse %62
+    public boolean isPalindrome2(int x) {
+    	if(x==0) {
+    		return true;
+    	}else if(x<0) {
+    		return false;
+    	}else {
+    		int revers = reverse(x);
+    		if(revers == x) {return true;}
+    		return false; 
+    	}
+    }
+    
+    //method 2: % 94
+    public boolean isPalindrome(int x) {
+    	if(x<0) return false;
+    	int origin = x;
+    	int revers = 0;
+    	while(x!=0) {
+    		int tail = x%10;
+    		revers = revers*10 + tail; //better remember how to check overflow; though not require (see above)
+    		x /= 10;
+    	}
+    	return origin == revers;
+    }
+    
+    // 10 regular expression matching (2D DP)
+    public boolean isMatch(String s, String p) {
+    	if(s == null || p == null) return false;
+    	boolean[][] dp = new boolean[s.length()+1][p.length()+1];
+        // no need to initialize dp[i][0] as false
+        // initialize dp[0][j]
+    	dp[0][0] = true;
+    	for(int j=1; j<dp[0].length; j++) {
+    		if(p.charAt(j-1)== '*') { //note: "j-1": j is based on table from 1; j-1 for string from 0
+    			//unchanged(x1) or delete(x0) 
+    			if(dp[0][j-1] || (j>1 && dp[0][j-2])) {
+        			dp[0][j] = true;
+    			}
+    		} 
+    	}   	
+    	//build bp table
+    	for(int i=1; i<dp.length; i++) {
+    		for(int j=1; j<dp[0].length; j++) {
+    			//good single instance
+    			if(s.charAt(i-1)==p.charAt(j-1) || p.charAt(j-1)=='.') {
+    				dp[i][j] = dp[i-1][j-1];
+    			}
+    			//2 "*" cases
+    			if(p.charAt(j-1)=='*') {
+    				//no common previous element
+    				if(p.charAt(j-2)!=s.charAt(i-1) && p.charAt(j-2)!='.') {
+    					//delete functionality
+    					dp[i][j] = dp[i][j-2];
+    				}else { //some common element
+    					//delete(x0) || no change (x1) || copy (x2 ... n)
+    					dp[i][j] = dp[i][j-2] || dp[i][j-1] || dp[i-1][j];
+    				}
+    			}
+    		}
+    	}
+    	return dp[s.length()][p.length()];
+    }
 
 	/**
 	 * Q11: Container With Most Water
@@ -211,15 +317,10 @@ public class BitTigerTop100 {
 	 * 14. Longest Common Prefix (vertical scanning: compare each string vertically) 
 	 */
 	public String longestCommonPrefix1(String[] strs) {
-		int strNum = strs.length;
 		//    	base case: empty string array
 		if (strs.length == 0 || strs == null) {
 			return "";
 		}
-		//    	if (strs.length == 1) {
-		//    		return strs[0];
-		//    	}
-		//    	general case: use the first string
 		for (int i = 0; i< strs[0].length(); i++) { // char numb
 			char c = strs[0].charAt(i); //all strs compare with the first string 
 			for (int j = 1; j < strs.length;j++) { // string numb
@@ -622,6 +723,29 @@ public class BitTigerTop100 {
 			}
 		}
 	}
+	
+	//42.Trapping Rain Water Difficulty O(n) time; O(1) space
+    public int trap(int[] height) {
+    	int len = height.length;
+    	//base case
+        if(len<3) return 0;
+        //iterate with two pointers
+        int l = 0, r = len-1, totalWater = 0;
+        // find the left and right edge which can hold water
+        while(l<r && height[l]<height[l+1]) l++;
+        while(l<r && height[r]<height[r-1]) r--;
+        //iterate over from both sides
+        while(l < r) {
+        	int lH = height[l], rH = height[r];
+        	//always move the lower height pointer
+        	if(lH <= rH) {
+            	while(l<r && lH>=height[++l]) totalWater += lH - height[l];
+        	}else {
+            	while(l<r && rH>=height[--r]) totalWater += rH - height[r];
+        	}
+        }
+    	return totalWater;
+    }
 
 	/**
 	 * 78. Subsets
@@ -1397,38 +1521,7 @@ public class BitTigerTop100 {
 		return dp[len-1];
 	}
 
-	//94.Binary Tree Inorder Traversal
-	public List<Integer> inorderTraversal(TreeNode root) {
-		ArrayList<Integer> lst = new ArrayList<Integer>();
-		Stack<TreeNode> stack = new Stack<TreeNode>();
 
-		TreeNode cur = root;
-
-		while(cur != null || !stack.empty()) {
-			while(cur != null) {
-				stack.push(cur);
-				cur = cur.left;
-			}
-			//left
-			cur = stack.pop();
-			lst.add(cur.val);
-			cur = cur.right;
-		}
-		return lst;
-	}
-	
-	ArrayList<Integer> lst_inorderTraversal_Rec = new ArrayList<Integer>();
-	
-	public List<Integer> inorderTraversal_Rec(TreeNode root) {
-		
-		if(root!=null) {
-			inorderTraversal_Rec(root.left);
-			lst_inorderTraversal_Rec.add(root.val);
-			inorderTraversal_Rec(root.right);
-		}
-		
-		return lst_inorderTraversal_Rec;
-	}
 	
 
 }

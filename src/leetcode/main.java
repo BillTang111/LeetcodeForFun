@@ -16,7 +16,7 @@ public class main {
 	public static void main(String[] args) {
 
 		BitTigerTop100 pt = new BitTigerTop100();
-		
+		BigTiger200 bt2 = new BigTiger200();
 
 //		int[] candidates = new int[] {2,5,2,1,2};
 //		int target = 5;
@@ -63,6 +63,10 @@ public class main {
 //		String s = "102";
 //		int res = pt.numDecodings(s);
 //		System.out.println(res);
+		
+		int[] g = new int[]{1,2,3,4,5};
+		int[] c = new int[]{3,4,5,1,2};
+		bt2.canCompleteCircuit(g,c);
 
 
 	}
