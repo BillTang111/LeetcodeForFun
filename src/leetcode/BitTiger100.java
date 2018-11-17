@@ -2,7 +2,7 @@ package leetcode;
 
 import java.util.*;
 
-public class BigTiger200 {
+public class BitTiger100 {
 
 	// 102.Binary Tree Level Order Traversal
 	public List<List<Integer>> levelOrder(TreeNode root) {
@@ -881,6 +881,39 @@ public class BigTiger200 {
 			tail.prev = newNode;
 		}
 	}
+	
+	//175 Combine Two Tables (In SQL)
+//	Select FirstName, LastName, City, State
+//	From Person Left Join Address on Person.PersonId = Address.PersonId;
+	
 
+	//200 Number of Islands
+	//Given a 2d grid map of '1's (land) and '0's (water), count the number of islands.
+	// idea: dfs or bfs
+    public int numIslands(char[][] grid) {
+        if(grid == null || grid.length ==0) return 0;
+        int num_islands=0;
+        for(int r=0; r<grid.length; r++) {
+        	for(int c=0; c<grid[0].length; c++) {
+        		if(grid[r][c]=='1') {
+        			++num_islands;
+        			dfs_numIslands( grid, r, c);
+        		}
+        	}
+        }
+    	return num_islands; 
+    }
+    
+    //helper function that sets 1 to 0 
+    public void dfs_numIslands(char[][] grid, int r, int c) {
+    	if (r<0 || c<0 || r>=grid.length || c>=grid[0].length || grid[r][c]=='0') return; 
+    	//set current spot to 0
+    	grid[r][c]='0';
+    	//visit neighbor nodes in 4 directions
+    	dfs_numIslands(grid, r-1, c);
+    	dfs_numIslands(grid, r+1, c);
+    	dfs_numIslands(grid, r, c-1);
+    	dfs_numIslands(grid, r, c+1);
+    }
 
 }

@@ -10,7 +10,7 @@ class TestBigTiger100_200 {
 
 	@Test
 	void wordBreak() {
-		BigTiger200 inst = new BigTiger200();
+		BitTiger100 inst = new BitTiger100();
 		String s = new String("Leetcode");
 		List<String> wordDict = new ArrayList<>();
 		wordDict.add("Leet"); wordDict.add("code");

@@ -15,8 +15,8 @@ public class main {
     
 	public static void main(String[] args) {
 
-		BitTigerTop100 pt = new BitTigerTop100();
-		BigTiger200 bt2 = new BigTiger200();
+		BitTiger000 pt = new BitTiger000();
+		BitTiger100 bt2 = new BitTiger100();
 
 //		int[] candidates = new int[] {2,5,2,1,2};
 //		int target = 5;
