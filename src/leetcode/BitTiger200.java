@@ -1,6 +1,7 @@
 package leetcode;
 
-import java.util.Arrays;
+import java.util.*;
+
 
 public class BitTiger200 {
 
@@ -111,6 +112,51 @@ public class BitTiger200 {
     	}else {//< 1000
     		return LESS_THAN_20[numOfHundred/100] + " Hundred " + trans(numOfHundred%100);
     	}
+    }
+    
+    //297. Serialize and Deserialize Binary Tree (DFS) (12 ms; 93% )
+    //You just need to ensure that a binary tree can be serialized to a string and 
+    //this string can be deserialized to the original tree structure.
+    public class Codec {
+    	//used to do <<Object>> comparison
+        private static final String spliter = ",";
+        private static final String NN = "n";
+
+        // Encodes a tree to a single string.
+        public String serialize(TreeNode root) {
+        	StringBuilder sb = new StringBuilder();
+        	serialize_dfs( root, sb);
+			return sb.toString();
+        }
+        
+        private void serialize_dfs(TreeNode root, StringBuilder sb) {
+        	if(root==null) {
+        		sb.append(NN).append(spliter); //null
+        	}else {
+            	sb.append(root.val).append(spliter);
+            	serialize_dfs(root.left, sb);
+            	serialize_dfs(root.right, sb);
+        	}
+        }
+
+        // Decodes your encoded data to tree.
+        public TreeNode deserialize(String data) {
+        	String[] dataArr = data.split(spliter);
+        	List<String> dataLst = new LinkedList<String> (Arrays.asList(dataArr));	
+			return deserialize_dfs(dataLst);
+        }
+        
+        //helper funct (use collection interface for removal purpose;)
+        public TreeNode deserialize_dfs(List<String> dataLst) {
+            String cur = dataLst.remove(0);
+        	if(cur.equals(NN)) { //Note: cur=="n" not working since cur is an object !!!
+        		return null;
+        	}
+        	TreeNode root = new TreeNode(Integer.parseInt(cur));
+        	root.left = deserialize_dfs(dataLst);
+        	root.right = deserialize_dfs(dataLst);
+        	return root;
+        }
     }
     
 }
