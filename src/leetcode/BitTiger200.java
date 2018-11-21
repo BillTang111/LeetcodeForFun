@@ -81,6 +81,13 @@ public class BitTiger200 {
     //method 2 :heap (priority queue) (time: n log n; space: n)
     //idea: sort on start time; keep all the current room in heap with earliest finishing time at top
     
+    //269. Alien Dictionary
+    //Kahn's Algorithm; topological sort; Topology Traversal ( similar BFS);  
+    public String alienOrder(String[] words) {
+		return null;
+        
+    }
+    
     
 	//273. Integer to English Words
 	//Convert a non-negative integer to its english words representation. Given input is guaranteed to be less than 231 - 1.
