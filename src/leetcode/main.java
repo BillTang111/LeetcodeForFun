@@ -17,6 +17,12 @@ public class main {
 
 		BitTiger000 pt = new BitTiger000();
 		BitTiger100 bt2 = new BitTiger100();
+		
+		//test String.valueOf() vs. Object.toString()
+//		char[] arrC = new char[] {'b','a','c'};
+//		Arrays.sort(arrC);
+//		System.out.println("THis is toString" + arrC.toString());
+//		System.out.println("THis is String.valueOf" + String.valueOf(arrC));
 
 //		int[] candidates = new int[] {2,5,2,1,2};
 //		int target = 5;
@@ -64,9 +70,9 @@ public class main {
 //		int res = pt.numDecodings(s);
 //		System.out.println(res);
 		
-		int[] g = new int[]{1,2,3,4,5};
-		int[] c = new int[]{3,4,5,1,2};
-		bt2.canCompleteCircuit(g,c);
+//		int[] g = new int[]{1,2,3,4,5};
+//		int[] c = new int[]{3,4,5,1,2};
+//		bt2.canCompleteCircuit(g,c);
 
 
 	}

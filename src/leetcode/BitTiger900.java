@@ -21,6 +21,62 @@ public class BitTiger900 {
     	return max;
     }
     
-	
-	
+	//945. Minimum Increment to Make Array Unique
+    //wrong
+    public int minIncrementForUnique(int[] A) {
+    	int len = A.length;
+    	if(len<2) return 0;
+    	Arrays.sort(A);
+    	int res = 0;
+    	
+    	for(int i=1;i<len;i++) {
+    		if(A[i]<=A[i-1]) {
+    			res += A[i-1] - A[i] +1;
+    			A[i]=A[i-1]+1;
+    		}
+    	}
+    	
+    	return res;
+    }
+    
+    //946. Validate Stack Sequences
+    public boolean validateStackSequences(int[] pushed, int[] popped) {
+    	Stack<Integer> stack = new Stack<>();
+    	int popPosition = 0;
+    	for(int pushNum : pushed) {
+    		stack.push(pushNum);
+    		while(!stack.empty() && stack.peek() == popped[popPosition]) {
+    			stack.pop();
+    			popPosition++;
+    		}
+    	}
+    	return stack.empty();
+    }
+    
+    
+    //948. Bag of Tokens (Greedy + Two Pointers)
+    //come up greedy idea with "Buy at the cheapest and sell at the most expensive."
+    public int bagOfTokensScore(int[] tokens, int P) {
+    	Arrays.sort(tokens); // cheapest to most expensive
+    	int cheapPos=0; int expensivePos=tokens.length-1;
+    	int totalPoints=0; int res = 0;
+    	while(cheapPos<=expensivePos) {
+    		if(P >= tokens[cheapPos]) {
+    			P -= tokens[cheapPos];
+    			cheapPos++;
+    			totalPoints++;
+    			res = Math.max(res, totalPoints); //check [28,76] and 62
+    		}else if(totalPoints>0) {
+    			totalPoints --;
+    			P += tokens[expensivePos];
+    			expensivePos--;
+    		}else { // Power < tokens[cheapPos]
+    			break;
+    		}
+    	}
+    	return res;
+//    	return totalPoints;
+    }
+    
+    
 }

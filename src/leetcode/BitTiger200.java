@@ -19,6 +19,50 @@ public class BitTiger200 {
         }
     	return prev; 
     }
+    
+    //210. Course Schedule II
+    //topological order in a directed graph.
+    public int[] findOrder(int numCourses, int[][] prerequisites) {
+        int[] in_degreeMap = new int[numCourses]; //in_degreeMap[i] = # of in edges
+        List<List<Integer>> graphMap = new ArrayList<List<Integer>>(numCourses); //graphMap[i]=nodes after it
+        buildGraph(in_degreeMap, graphMap, prerequisites);
+        return solveByBFS(in_degreeMap, graphMap);
+    }
+    //Transform problem into a DAG
+    private void buildGraph(int[] in_degreeMap, List<List<Integer>> graphMap, int[][] prerequisites) {
+    	int num = in_degreeMap.length;
+    	//init graphMap
+    	while(num -- > 0) {
+    		graphMap.add(new ArrayList<Integer>());
+    	}
+    	//build graph
+    	for(int[] edge : prerequisites) {
+    		in_degreeMap[edge[0]] ++;
+    		graphMap.get(edge[1]).add(edge[0]);
+    	}
+    }
+    //Kern's algo
+    private int[] solveByBFS(int[] in_degreeMap, List<List<Integer>> graphMap) {
+    	int num = in_degreeMap.length;
+    	Queue<Integer> que = new LinkedList<>();
+    	int[] classOrder = new int[num];
+    	//add 0 in-degree to que
+    	for(int i=0; i<num; i++) {
+    		if(in_degreeMap[i]==0) que.add(i);
+    	}
+    	//BFS
+    	int visited = 0;
+    	while(!que.isEmpty()) {
+    		int curNode = que.poll(); //poll is better than remove here (empty)
+    		classOrder[visited++] = curNode;
+    		for(int neighbor : graphMap.get(curNode)) {
+    			//delete edge
+    			in_degreeMap[neighbor]--;
+    			if(in_degreeMap[neighbor]==0) que.add(neighbor);
+    		}
+    	}
+    	return visited == num ? classOrder : new int[0]; 
+     }
 	
     //238. Product of Array Except Self: Time(O(n)); Space O(1)
     //Given an array nums of n integers where n > 1,  return an array output such that 
@@ -82,10 +126,66 @@ public class BitTiger200 {
     //idea: sort on start time; keep all the current room in heap with earliest finishing time at top
     
     //269. Alien Dictionary
-    //Kahn's Algorithm; topological sort; Topology Traversal ( similar BFS);  
+    //Kahn's Algorithm: works by choosing vertices in the same order as the eventual topological sort 
+    //topological sort; Topology Traversal ( similar BFS);  
+    //	建图 --> in-degree=0 --> BFS 
     public String alienOrder(String[] words) {
-		return null;
-        
+        if(words==null || words.length==0) return "";
+    	
+    	Map<Character, Set<Character>> graphMap = new HashMap<>(); //map to store graph
+    	Map<Character, Integer> degreeMap = new HashMap<>();
+    	
+    	//1. build graph: degreeMap && graphMap 
+    	for(String word : words) {
+    		for(char c : word.toCharArray()) {
+    			degreeMap.put(c, 0);
+    		}
+    	}
+    	for(int i=0;i<words.length-1;i++) {
+    		String curWord = words[i];
+    		String nextWord = words[i+1];
+    		int minLen = Math.min(curWord.length(), nextWord.length());
+    		for(int j=0; j<minLen;j++) { //compare each char in two words 
+    			char c1=curWord.charAt(j);
+    			char c2=nextWord.charAt(j);
+    			if(c1!=c2) {
+    				Set<Character> set = new HashSet<>();
+    				if(graphMap.containsKey(c1)) {
+    					set = graphMap.get(c1);
+    				}
+    				if(!set.contains(c2)) {
+    					set.add(c2);
+    					graphMap.put(c1, set);
+    					degreeMap.put(c2, degreeMap.get(c2)+1);
+    				}
+    				break; //only 1 ordering between words
+    			}
+    		}
+    	}
+    	//2. find 0 in-degree nodes to start
+    	Queue<Character> queue = new LinkedList<Character>(); 
+    	for(char c : degreeMap.keySet()) {
+    		if(degreeMap.get(c)==0) {
+    			queue.add(c); 
+    		}
+    	}
+    	//3. BFS and find order along the way --> Topology Traversal
+    	StringBuilder res = new StringBuilder();
+    	while(!queue.isEmpty()) {
+    		char cur = queue.remove();
+    		res.append(cur);
+    		if(graphMap.containsKey(cur)) { //required: a node pointed by no one is possible
+        		for(char neighbor : graphMap.get(cur)) {
+        			degreeMap.put(neighbor, degreeMap.get(neighbor)-1); //remove edge pointed by cur
+        			if(degreeMap.get(neighbor) == 0) {
+        				queue.add(neighbor);
+        			}
+        		}
+    		}
+    	}
+    	if(degreeMap.size() != res.length()) return ""; //cycle is detracted (not DAG)
+  
+		return res.toString();   
     }
     
     
@@ -119,6 +219,25 @@ public class BitTiger200 {
     	}else {//< 1000
     		return LESS_THAN_20[numOfHundred/100] + " Hundred " + trans(numOfHundred%100);
     	}
+    }
+    
+    //283. Move Zeroes 
+    // TWO POINTER
+    public void moveZeroes(int[] nums) {
+
+        int j = 0;
+        for(int i = 0; i < nums.length; i++) {
+            if(nums[i] != 0) {
+                swap(nums, i, j);
+                j++;
+            }
+        }
+    }
+    
+    private void swap(int[] nums, int p1, int p2) {
+    	int temp = nums[p1];
+    	nums[p1] = nums[p2];
+    	nums[p2] = temp;
     }
     
     //297. Serialize and Deserialize Binary Tree (DFS) (12 ms; 93% )
@@ -164,6 +283,36 @@ public class BitTiger200 {
         	root.right = deserialize_dfs(dataLst);
         	return root;
         }
+    }
+    
+    
+	//200 Number of Islands
+	//Given a 2d grid map of '1's (land) and '0's (water), count the number of islands.
+	// idea: dfs or bfs
+    public int numIslands(char[][] grid) {
+        if(grid == null || grid.length ==0) return 0;
+        int num_islands=0;
+        for(int r=0; r<grid.length; r++) {
+        	for(int c=0; c<grid[0].length; c++) {
+        		if(grid[r][c]=='1') {
+        			++num_islands;
+        			dfs_numIslands( grid, r, c);
+        		}
+        	}
+        }
+    	return num_islands; 
+    }
+    
+    //helper function that sets 1 to 0 
+    public void dfs_numIslands(char[][] grid, int r, int c) {
+    	if (r<0 || c<0 || r>=grid.length || c>=grid[0].length || grid[r][c]=='0') return; 
+    	//set current spot to 0
+    	grid[r][c]='0';
+    	//visit neighbor nodes in 4 directions
+    	dfs_numIslands(grid, r-1, c);
+    	dfs_numIslands(grid, r+1, c);
+    	dfs_numIslands(grid, r, c-1);
+    	dfs_numIslands(grid, r, c+1);
     }
     
 }

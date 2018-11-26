@@ -1,5 +1,6 @@
 package leetcode;
 
+import java.sql.Array;
 import java.util.*;
 
 //Question 1 - 5, 11
@@ -1093,21 +1094,6 @@ public class BitTiger000 {
 		return (sb.length() == 0) ? "0" : sb.toString();
 	}
 
-	/**
-	 * 49. Group Anagrams
-	 * 
-	 * @param strs
-	 * @return intuition1: Two strings are anagrams if and only if their sorted
-	 *         strings are equal. intuition2: Two strings are anagrams if and only
-	 *         if their character counts
-	 */
-
-	public List<List<String>> groupAnagrams(String[] strs) {
-
-		return null;
-
-	}
-
 	/*
 	 * iPihone drop DP problem
 	 */
@@ -1397,7 +1383,36 @@ public class BitTiger000 {
 				return level;
 		}
 		return 0;
+		
 	}
+	
+	/**
+	 * 49. Group Anagrams 
+	 * @param strs
+	 * @return intuition1: Two strings are anagrams if and only if their sorted
+	 *         strings are equal. intuition2: Two strings are anagrams if and only
+	 *         if their character counts
+	 */
+    public List<List<String>> groupAnagrams(String[] strs) {
+    	if(strs==null || strs.length==0) return new ArrayList<List<String>>();
+    	HashMap<String, List<String>> map = new HashMap<>();
+    	for(String str : strs) {
+    		char[] strChar = str.toCharArray();
+    		Arrays.sort(strChar);
+    		//return string representation 
+    		String back2String = String.valueOf(strChar); 
+    		
+    		//toString not working on char[] !!! return array address [C@33909752
+    		//String back2String2 = strChar.toString();  (toString)
+    		
+    		if(!map.containsKey(back2String)) {
+    			List<String> lst = new LinkedList<>();
+    			map.put(back2String, lst);
+    		}
+    		map.get(back2String).add(str);
+    	}
+    	return new ArrayList<List<String>> (map.values()); //this is new 
+    }
 
 	/**
 	 * 56. Merge Intervals (two pointers) sort then merge
@@ -1694,5 +1709,77 @@ public class BitTiger000 {
 		}
 		return dp[len - 1];
 	}
+	
+	
+	// 94.Binary Tree In-order Traversal (1 ms -> 62%)
+	public List<Integer> inorderTraversal2(TreeNode root) {
+		ArrayList<Integer> lst = new ArrayList<Integer>();
+		Stack<TreeNode> stack = new Stack<TreeNode>();
+		TreeNode cur = root;
+		while (cur != null || !stack.empty()) {
+			while (cur != null) {
+				stack.push(cur);
+				cur = cur.left;
+			}
+			// left
+			cur = stack.pop();
+			lst.add(cur.val);
+			cur = cur.right;
+		}
+		return lst;
+	}
 
+	// method 2: recursive method (0 ms)
+	public List<Integer> inorderTraversal(TreeNode root) {
+		LinkedList<Integer> result = new LinkedList<Integer>();
+		if (root == null)
+			return result;
+		dfs_inorderTraversal(root, result);
+		return result;
+	}
+
+	private void dfs_inorderTraversal(TreeNode root, LinkedList<Integer> result) {
+		if (root == null)
+			return;
+		dfs_inorderTraversal(root.left, result);
+		result.add(root.val);
+		dfs_inorderTraversal(root.right, result);
+	}
+	
+	
+	//98. Validate Binary Search Tree
+	//Given a binary tree, determine if it is a valid binary search tree (BST).
+	// Method 1: (in-order traversal) + DFS; Stack;  //29%
+    public boolean isValidBST1(TreeNode root) { 
+        if(root == null) return true;
+        TreeNode prev = null; //key to this problem; in-order runs in increasing order 
+        Stack<TreeNode> stack = new Stack<>();
+        while(root!=null || !stack.empty()) {
+        	while(root != null) {
+        		stack.push(root);
+        		root = root.left;
+        	}
+        	root = stack.pop();
+        	if(prev != null && prev.val >= root.val) {
+        		return false;
+        	}
+        	prev = root;
+        	root = root.right;
+        }
+    	return true;
+    }
+    
+    //method 2: DFS with record for min and max 
+    // 100 % 
+    public boolean isValidBST(TreeNode root) {
+        return isValidBST(root, Long.MIN_VALUE, Long.MAX_VALUE);
+    }
+    
+    public boolean isValidBST(TreeNode root, long minVal, long maxVal) {
+        if (root == null) return true;
+        if (root.val >= maxVal || root.val <= minVal) return false;
+        return isValidBST(root.left, minVal, root.val) && isValidBST(root.right, root.val, maxVal);
+    }
+    
+    
 }

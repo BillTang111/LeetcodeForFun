@@ -2,7 +2,7 @@ package leetcode;
 
 import java.util.*;
 
-class LRUCache {
+public class LRUCache {
 	int Total_cap;
 	HashMap<Integer, Integer> storage;
 	Queue<Integer> LRU_Que;

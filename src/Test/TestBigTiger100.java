@@ -1,12 +1,15 @@
-package leetcode;
+package Test;
 
+import leetcode.LRUCache;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
 
 import org.junit.jupiter.api.Test;
 
-class TestBigTiger100_200 {
+import leetcode.BitTiger100;
+
+class TestBigTiger100 {
 
 	@Test
 	void wordBreak() {
