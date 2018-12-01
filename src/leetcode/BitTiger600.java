@@ -29,6 +29,32 @@ public class BitTiger600 {
     	}
     }
     
+    //695. Max Area of Island
+    public int maxAreaOfIsland(int[][] grid) {
+        if(grid == null) return 0;
+        int maxArea=0;
+    	for(int i=0;i<grid.length;i++) {
+    		for(int j=0; j<grid[0].length;j++) {
+    			if(grid[i][j]==1) {
+    				int curArea = dfs_maxAreaOfIsland(grid, i, j);
+    				maxArea = Math.max(curArea, maxArea);
+    			}
+    		}
+    	}
+    	return maxArea;
+    }
+    
+    //set 1 to 0 as visited by DFS and return area in this island
+    public int dfs_maxAreaOfIsland(int[][] grid, int col, int row) {
+    	if(col<0 || col>=grid.length || row<0 || row>=grid[0].length || grid[col][row]==0) return 0;
+    	
+        grid[col][row] = 0;
+ 
+    	return 1 + dfs_maxAreaOfIsland(grid, col-1, row) 
+    	+ dfs_maxAreaOfIsland(grid, col+1, row) 
+    	+ dfs_maxAreaOfIsland(grid, col, row-1)
+    	+ dfs_maxAreaOfIsland(grid, col, row+1);
+    }
     
 	
 }

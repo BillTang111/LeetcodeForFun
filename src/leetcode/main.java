@@ -13,10 +13,36 @@ public class main {
         }
     }
     
-	public static void main(String[] args) {
 
-		BitTiger000 pt = new BitTiger000();
-		BitTiger100 bt2 = new BitTiger100();
+	public static void Example( int number)
+	{
+	    number = 44;
+	}
+	
+	static void Func1(int[] array)
+	{
+		array=new int[] {1,2,3};
+	}
+	
+	void Func2(int[] array)
+	{
+	Arrays.sort(array);
+	}
+	
+	public static void main(String[] args) {
+		
+		
+		int number = 0;
+		Example(0);
+		System.out.println(number);
+//		
+//		int[] arr = new int[] {3,3};
+//		Func1(arr);
+//		System.out.println(Arrays.toString(arr));
+		
+		
+//		BitTiger000 pt = new BitTiger000();
+//		BitTiger100 bt2 = new BitTiger100();
 		
 		//test String.valueOf() vs. Object.toString()
 //		char[] arrC = new char[] {'b','a','c'};

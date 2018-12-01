@@ -853,7 +853,35 @@ public class BitTiger100 {
 //	Select FirstName, LastName, City, State
 //	From Person Left Join Address on Person.PersonId = Address.PersonId;
 	
+	//198. House Robber (DP)
+	//Great discussion! 
+	//https://leetcode.com/problems/house-robber/discuss/156523/From-good-to-great.-How-to-approach-most-of-DP-problems.
+    //rob(i) = Math.max( rob(i - 2) + currentHouseValue, rob(i - 1) )
+	// Note: This is O(n) in space; time O(n)
+	public int rob(int[] nums) {
+	    if(nums.length==0) return 0;
+	    if(nums.length==1) return nums[0];
+    	int len = nums.length;
+    	int[] table = new int[len]; 
+    	table[0] = nums[0];
+    	table[1] = Math.max(nums[0], nums[1]);
+    	for(int i=2;i<len;i++) {
+    		table[i]=Math.max(table[i-2]+nums[i], table[i-1]);
+    	}
+    	return table[len-1];
+    }
 
-
+	//Method 2: O(1) space by using 2 variables
+	public int rob2(int[] nums) {
+	    if (nums.length == 0) return 0;
+	    int prev1 = 0;
+	    int prev2 = 0;
+	    for (int num : nums) {
+	        int tmp = prev1;
+	        prev1 = Math.max(prev2 + num, prev1); //current
+	        prev2 = tmp;
+	    }
+	    return prev1;
+	}
 
 }

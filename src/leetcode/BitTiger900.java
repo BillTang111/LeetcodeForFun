@@ -78,5 +78,27 @@ public class BitTiger900 {
 //    	return totalPoints;
     }
     
+    //929. Unique Email Addresses
+    public int numUniqueEmails(String[] emails) {
+        HashSet<String> set = new HashSet<String>();
+    	
+    	for(String s : emails) {
+    		int indexAt = s.indexOf('@');
+    		int firstAdd = s.indexOf('+');
+    		String local ="";
+    		if(firstAdd < indexAt) {
+        		 local = s.substring(0,firstAdd);
+
+    		}else {
+        		 local = s.substring(0,indexAt);
+    		}
+    		String localName = local.replace(".", "");
+    		String total = localName+s.substring(indexAt+1);
+    		set.add(total);
+    	}
+    	return set.size();
+    }
+    
+    
     
 }

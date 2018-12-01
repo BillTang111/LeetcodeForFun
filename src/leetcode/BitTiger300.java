@@ -38,7 +38,41 @@ public class BitTiger300 {
     }
     
     
+    //322. Coin Change (DB) 
+    //note: "Solution" is really great!!!
+    //method 1: [back tracking (DFS)] to enumerate all subsets of coin frequencies 
+    //and return the minimum. (try each coin c, try amount/c of them); time: O(amount ^ n)
+    //method 2.1 & 2.2 : Dynamic Programming O(amount*denominations) 
+    //Top-down (back-tracking) & Bottom-up (iterative)
+    //F(S) - minimum number of coins needed to make change for amount S (see "solution" )
+    //Method 1: Bottom-up (iterative)
+    public int coinChange(int[] coins, int amount) {
+    	//set up table
+    	int coinLen = coins.length;
+    	int[] dp = new int[amount+1]; //0, 1....6
+    	Arrays.fill(dp, amount+1); //for minimum
+    	dp[0] = 0; //init
+    	for(int i=1; i<=amount;i++) { //amount
+    		for(int j=0; j<coinLen; j++)//coin denomination
+    		{
+    			if(i>=coins[j]) {
+        			dp[i] = Math.min(dp[i], dp[i-coins[j]]+1); 
+    			}
+    		}
+    	}
+		return dp[amount] == amount+1 ? -1 : dp[amount];
+    }
     
+    //DP: Top-down;  back-tracking; min length in the tree
+//    public int coinChange2(int[] coins, int amount) {
+//
+//		return 0;
+//    }
     
-    
+    //338. Counting Bits
+    public int[] countBits(int num) {
+        
+    	
+    	return null;
+    }
 }
