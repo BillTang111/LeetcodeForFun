@@ -100,5 +100,54 @@ public class BitTiger900 {
     }
     
     
+    //949. Largest Time for Given Digits (permutation)
+    public String largestTimeFromDigits(int[] A) {
+        if(A.length<4 || A==null ) return "";
+        Arrays.sort(A);
+        if(A[0]>2) return "";
+        //use string or array for permutation
+        String strToPermut ="";
+        for(int a : A) {
+        	strToPermut += a;
+        }
+        //string to store all 4x4 arrangement 
+        List<String> lst = new LinkedList<String>();
+        permutation_LTFD("", strToPermut,lst);
+        //find largest time among them
+        String time = "";
+        for(String s: lst) {
+        	s = s.substring(0,2)+":"+s.substring(2);
+        	//compareTo is every helpful here at 0"0":00
+        	if(s.charAt(0)<='2' && s.charAt(3)<'6' && s.compareTo("24:00")<0) {
+        		//compareTo: Compares two strings lexicographically. 
+        		time = time.compareTo(s) < 0 ? s : time;
+        	}
+        }
+        return time;
+    }
+    
+    //this permutation method is what i could not do during the contest
+    private void permutation_LTFD(String prefix, String strToPermut, List<String> lst) {
+    	int strToPermut_len=strToPermut.length();
+    	if(strToPermut_len==0) lst.add(prefix);
+    	else {
+    		for(int i=0;i<strToPermut_len;i++) {
+    			permutation_LTFD( prefix + strToPermut.charAt(i), 
+    					strToPermut.substring(0, i)+strToPermut.substring(i+1), lst);
+    		}
+    	}		
+    }
+    
+    //951. Flip Equivalent Binary Trees
+    public boolean flipEquiv(TreeNode root1, TreeNode root2) {
+
+    	if(root1==null && root2==null) return true;
+    	if(root1==null && root2!=null) return false;
+    	if(root1!=null && root2==null) return false;
+        if(root1.val != root2.val) return false;
+        
+        return (flipEquiv( root1.left, root2.right) && flipEquiv( root1.right, root2.left))
+        		||(flipEquiv( root1.right, root2.right) && flipEquiv( root1.left, root2.left));
+    }
     
 }

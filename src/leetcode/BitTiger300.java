@@ -69,10 +69,25 @@ public class BitTiger300 {
 //		return 0;
 //    }
     
-    //338. Counting Bits
+    //338. Counting Bits (DP)
+    //f[i] = f[i / 2] + i % 2. 
+    //Take number X for example, 10011001.
+//    Divide it in 2 parts:
+//    	<1>the last digit ( 1 or 0, which is " i&1 ", equivalent to " i%2 " )
+//    	<2>the other digits ( the number of 1, which is " f[i >> 1] ", equivalent to " f[i/2] " )
     public int[] countBits(int num) {
+    	int[] table = new int[num+1];
+    	for(int i=0;i<=num;i++) {
+    		table[i]=table[i>>1] + i%2;
+    		//    for (int i=1; i<=num; i++) f[i] = f[i / 2] + (i % 2); (slower)
+    	}
+    	return table;
+    }
+    
+    
+    //393. UTF-8 Validation
+    public boolean validUtf8(int[] data) {
+		return false;
         
-    	
-    	return null;
     }
 }
