@@ -13,93 +13,64 @@ public class main {
         }
     }
     
-
-	public static void Example( int number)
-	{
-	    number = 44;
-	}
-	
-	static void Func1(int[] array)
-	{
-		array=new int[] {1,2,3};
-	}
-	
-	void Func2(int[] array)
-	{
-	Arrays.sort(array);
-	}
 	
 	public static void main(String[] args) {
 		
+		int[] x = { 9, 2, 4, 7, 3, 7, 10 };
+		int[] xb = { 9, 2, 4, 7, 3, 7, 10 };
 		
-		int number = 0;
-		Example(0);
-		System.out.println(number);
-//		
-//		int[] arr = new int[] {3,3};
-//		Func1(arr);
-//		System.out.println(Arrays.toString(arr));
-		
-		
-//		BitTiger000 pt = new BitTiger000();
-//		BitTiger100 bt2 = new BitTiger100();
-		
-		//test String.valueOf() vs. Object.toString()
-//		char[] arrC = new char[] {'b','a','c'};
-//		Arrays.sort(arrC);
-//		System.out.println("THis is toString" + arrC.toString());
-//		System.out.println("THis is String.valueOf" + String.valueOf(arrC));
+		int[] expect = {2, 3, 4, 7, 7, 9, 10};
+		int low = 0;
+		int high = x.length - 1;
 
-//		int[] candidates = new int[] {2,5,2,1,2};
-//		int target = 5;
-//		System.out.println(pt.combinationSum2(candidates, target));
+		int a = partition(x, low, high);
+		System.out.println("this is the pivot for my: "+ a);
+		System.out.println(Arrays.toString(x));
 		
-//		int[] candidates = new int[] {2,1,1};
-//		System.out.println(pt.permuteUnique(candidates));
-		
-//		String ss = "aaab";
-//		System.out.println(pt.partition(ss) );
-		
-//		int[] candidates = new int[] {3,4,-1,1};
-//		System.out.println(pt.firstMissingPositive(candidates) );
-		
-//		System.out.println(pt.multiply("123", "456"));
-		
-//        int eggs = 3;
-//        int floors = 100;
-//        System.out.printf("(DP) Minimum number of drops required in worst case with eggs: %s and floors: %s is : %s",eggs,floors,pt.leastDrop(eggs,floors));
-		
-//		int[][] candidates = new int[][] {{1,2,3},{4,5,6},{7,8,9}};
-//		System.out.println(pt.spiralOrder(candidates));
-		
-//		String word1 = "horse", word2 = "ros";
-//		int res = pt.minDistance(word1, word2);
-//		System.out.println(res);
-		
-//    	int[][] dp = new int[3][3]; //0....n or m 
-//    	print2D(dp);
-    	
-//        int[] map = new int[256];
-//        map['c'] ++;
-//        int a = 'c';
-//        System.out.println(a);
-        
-//		String word1 = "ADOBECODEBANC", word2 = "ABC";
-//		String res = pt.minWindow(word1, word2);
-//		System.out.println(res);
-		
-//		int[] input = new int[]{1,2,3};
-//		int res = pt.largestRectangleArea(input);
-//		System.out.println(res);
-		
-//		String s = "102";
-//		int res = pt.numDecodings(s);
-//		System.out.println(res);
-		
-//		int[] g = new int[]{1,2,3,4,5};
-//		int[] c = new int[]{3,4,5,1,2};
-//		bt2.canCompleteCircuit(g,c);
-
-
+		int b = partition2(xb, low, high);
+		System.out.println("this is the pivot for b: "+ b);
+		System.out.println(Arrays.toString(xb));
 	}
+	
+	public static int partition(int[] b, int h, int k) {
+		int j = h; int t = k;
+		while(j<t) {
+			if(b[j+1]<=b[j]) {
+				swap(b,j+1,j); j++;
+			}else {
+				swap(b,j+1,t); t--;
+			}
+		}
+	    return j;
+	}
+	
+	static int partition2(int[] array, int left, int right){
+        int pivotIndex = left + (right - left)/2;
+        int pivot = array[pivotIndex];
+        swap(array, pivotIndex, right);
+
+        int leftBound = left;
+        int rightBound = right - 1;
+        while(leftBound <= rightBound){
+            if(array[leftBound] < pivot){
+                leftBound++;
+            }else if(array[rightBound] >= pivot){
+                rightBound--;
+            }else{
+                swap(array, leftBound++, rightBound--);
+            }
+        }
+        swap(array, leftBound, right);
+        return leftBound;
+    }
+	
+	
+	
+    static void swap(int[] array, int left, int right){
+        int temp = array[left];
+        array[left] = array[right];
+        array[right] = temp;
+    }
+    
+    
 }

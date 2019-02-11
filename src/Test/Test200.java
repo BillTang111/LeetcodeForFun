@@ -51,4 +51,37 @@ class Test200 {
 		Assert.assertArrayEquals(res,arr);
 		
 	}
+	
+	@Test
+	void StringTest() {
+		String a = "abcd";
+		String c = "abcd";
+		Assert.assertTrue(a==c);
+		
+	}
+	
+	@Test
+	void try1() {
+		int a = 14;
+		String b = Integer.toString(a);
+		Assert.assertEquals("14" , b);
+		
+	}
+	
+	@Test
+	void calculate() {
+		String a = "(1+(4+5+2)-3)+(6+8)";
+		Assert.assertEquals(23,bt200.calculate(a));
+		
+	}
+	
+	@Test
+	void wordPatternMatch() {
+		String pattern = "abab";
+		String str = "redblueredblue";
+		assertEquals(true, bt200.wordPatternMatch( pattern,  str));
+		
+	}
+	
+	
 }

@@ -448,6 +448,146 @@ public class BitTiger100 {
 		// l == root & r == root -> max(l's link, r's link);
 		return Math.max(resl, resr);
 	}
+	
+	//127. Word Ladder (Graph search; bidirectional BFS) ; 
+	//花花酱 O(b^(d/2)) = O(n * (26 * l)); n = |wordList|; l = length(word)
+    // termination: if beginSet x endSet != empty
+    public int ladderLength(String beginWord, String endWord, List<String> wordList) {
+    	int len = wordList.get(0).length(); //words have save length
+    	int ladderLen = 1; //for beginWord
+    	HashSet<String> dict = new HashSet<>(wordList);
+    	HashSet<String> beginSet = new HashSet<>();
+    	HashSet<String> endSet = new HashSet<>();
+    	HashSet<String> visited = new HashSet<>();
+    	
+    	if(!dict.contains(endWord)) return 0;
+    	
+    	beginSet.add(beginWord);
+    	endSet.add(endWord);
+    	visited.add(beginWord); visited.add(endWord);
+    	
+    	while(!beginSet.isEmpty() && !endSet.isEmpty()) {
+    		//To perform a bidirectional search, keep two sets balanced; expend the smaller one first
+    		if(beginSet.size() > endSet.size()) {
+    			HashSet<String> temp = beginSet;
+    			beginSet = endSet;
+    			endSet = temp;
+    		}
+
+    		HashSet<String> nextSet = new HashSet<>();
+    		for(String word : beginSet) {
+    			char[] letters = word.toCharArray();
+    			for(int i=0; i<len; i++) {
+    				char old = letters[i];
+    				for(char c='a'; c<='z'; c++) {
+    					if(letters[i] == c) continue;
+    					letters[i] = c; //brute force to try 26 letters on position i
+    					String curWord = String.valueOf(letters);
+    					if(endSet.contains(curWord)) return ladderLen+1; //goal
+    					if(dict.contains(curWord) && !visited.contains(curWord)) { //for next level & prevent loop
+    						visited.add(curWord);
+    						nextSet.add(curWord);
+    					}
+    				}
+    				letters[i] = old; //convert back
+    			}
+    		}
+    		
+    		beginSet = nextSet; // queue for next level
+    		ladderLen++;
+    	}
+    	
+		return 0;
+    }
+	
+	//126. Word Ladder II (BFS + DFS) O(n*26*l)
+    //BFS to create a graph; DFS to find paths
+    public List<List<String>> findLadders(String beginWord, String endWord, List<String> wordList) {
+    	List<List<String>> res = new ArrayList<>();
+    	HashSet<String> dict = new HashSet<>(wordList);
+    	if(!dict.contains(endWord)) return res;
+    	
+    	// initialization for two-end BFS
+    	HashSet<String> startSet = new HashSet<>();
+    	HashSet<String> endSet = new HashSet<>();
+    	startSet.add(beginWord);
+    	endSet.add(endWord);
+    	// map the list of parents to each node
+    	HashMap<String, List<String>> graphMap = new HashMap<>();
+    	//BFS to create a graph;
+    	findLadders_bfs(startSet,endSet,dict,graphMap);
+    	//DFS to find paths
+    	List<String> tempLst = new ArrayList<>(); //save current path
+    	tempLst.add(beginWord);
+    	findLadders_dfs(graphMap,res,beginWord,endWord,tempLst);
+    	
+		return res;
+        
+    }
+	
+    /* use bfs to build the children graph*/
+    private void findLadders_bfs(Set<String> startSet,Set<String> endSet, Set<String> dict, Map<String, List<String>> graphMap) {
+    	boolean reversed = false;
+    	boolean terminate = false;
+    	while(!startSet.isEmpty()) {
+    		//To perform a bidirectional search, keep two sets balanced;
+    		if(startSet.size()>endSet.size()) {
+    			reversed = !reversed;
+    			Set<String> temp = startSet;
+    			startSet = endSet;
+    			endSet = temp;
+    		}
+    		dict.removeAll(startSet); //prevent looping; process start set this term; 
+    		Set<String> nextSet = new HashSet<>();
+    		for(String word : startSet) {
+    			char[] letters = word.toCharArray();
+    			int strLen = letters.length;
+    			for(int i=0; i<strLen; i++) {
+    				char old = letters[i];
+    				for(char c='a'; c<='z';c++) {
+    					if(c==old) continue;
+    					letters[i] = c;
+    					String newWord = String.valueOf(letters);
+    					if(dict.contains(newWord) || endSet.contains(newWord)) {
+    						String key = reversed ? newWord : word;
+    						String value = reversed ? word : newWord;
+    						graphMap.putIfAbsent(key, new ArrayList<String>());
+    						graphMap.get(key).add(value);
+    						if(endSet.contains(newWord)) {
+    	    					//terminate!=true: screen out paths that are not shortest
+    							terminate = true;
+    						}else {
+        						nextSet.add(newWord);
+    						}
+    						
+    					}
+    				}
+					letters[i] = old;
+    			}
+    		}
+    		startSet = nextSet;
+    		if(terminate) break;
+    	}
+    }
+    
+    /* use dfs to find all the shortest paths based on child graph (parent -> children)*/
+    private void findLadders_dfs(Map<String, List<String>> graphMap, List<List<String>> res, String cur, String endWord, List<String> tempLst) {
+    	
+    	if(cur.equals(endWord)) { //!!! required for string compare
+    		//Explain for "new ArrayList<>(list)" : (create a new object, not affected by changes)
+    		//https://stackoverflow.com/questions/51825663/why-res-addnew-arraylistlist-here
+    		res.add(new ArrayList<>(tempLst));
+    		return;
+    	}
+        // if not contained, that means this path is not shortest
+    	if(!graphMap.containsKey(cur)) return;
+    	for(String next : graphMap.get(cur)) {
+    		tempLst.add(next);
+    		findLadders_dfs(graphMap, res, next, endWord, tempLst);
+    		tempLst.remove(next); 
+    	}
+    }
+    
 
 	// 128. Longest Consecutive Sequence O(n)
 	public int longestConsecutive(int[] nums) {
@@ -473,6 +613,45 @@ public class BitTiger100 {
 		}
 		return ans;
 	}
+	
+	/**
+	 * 131. Palindrome Partitioning Given a string s, partition s such that every
+	 * substring of the partition is a palindrome.
+	 */
+	public List<List<String>> partition(String s) {
+		List<List<String>> result = new ArrayList<>();
+		// base case
+		if (s == null || s.length() == 0)
+			return result;
+		// general case
+		backTrack_partition(s, result, new ArrayList<String>(), 0);
+		return result;
+	}
+
+	// check and partition s[index, s.length)
+	private void backTrack_partition(String s, List<List<String>> result, List<String> curLst, int index) {
+		if (index >= s.length()) {
+			result.add(new ArrayList<String>(curLst));
+			return;
+		}
+		for (int i = index; i < s.length(); i++) {
+			if (isPalindrome(s, index, i)) {
+				curLst.add(s.substring(index, i + 1));
+				backTrack_partition(s, result, curLst, i + 1); // NOTE:i+1 not index+1 (recursion in depth)
+				curLst.remove(curLst.size() - 1);
+			}
+		}
+	}
+
+	// check if a string is a Palindrome for s[left, right]
+	private boolean isPalindrome(String s, int left, int right) {
+		while (left < right) {
+			if (s.charAt(left++) != s.charAt(right--))
+				return false;
+		}
+		return true;
+	}
+
 
 	// 133. Clone Graph (graph traversal - DFS/BFS)
 	// https://www.youtube.com/watch?v=V0j1IEBkK4k
@@ -772,7 +951,7 @@ public class BitTiger100 {
 		}
 	}
 
-	// Method 2: doubled linked list O(1) by only changing pointss;
+	// Method 2: doubled linked list O(1) by only changing pointers;
 	class LRUCache {
 
 		// data structure for
@@ -789,7 +968,7 @@ public class BitTiger100 {
 		}
 
 		HashMap<Integer, DlinkNode> map; // Key O(n)->O(1): remove by directly locate DlinkNode object without searching
-		DlinkNode head, tail;
+		DlinkNode head, tail; //two dummy nodes
 		int cap;
 
 		// constructor
@@ -801,17 +980,7 @@ public class BitTiger100 {
 			head.next = tail;
 			tail.prev = head;
 		}
-
-		// Get the value (will always be positive) of the key if the key exists in the
-		// cache, otherwise return -1
-		public int get(int key) {
-			if (!map.containsKey(key))
-				return -1;
-			DlinkNode cur = map.get(key);
-			MoveNodeToTail(cur); // target on object (not primitives) -> cut searching time
-			return cur.value;
-		}
-
+		
 		// re-allocate key to end tail of the linked list
 		private void MoveNodeToTail(DlinkNode cur) {
 			if (tail.prev == cur)
@@ -826,6 +995,17 @@ public class BitTiger100 {
 			tail.prev = cur;
 		}
 
+		// Get the value (will always be positive) of the key if the key exists in the
+		// cache, otherwise return -1
+		public int get(int key) {
+			if (!map.containsKey(key)) {
+				return -1;
+			}
+			DlinkNode cur = map.get(key);
+			MoveNodeToTail(cur); // target on object (not primitives) -> cut searching time
+			return cur.value;
+		}
+
 		public void put(int key, int value) {
 			if (map.containsKey(key)) {
 				DlinkNode cur = map.get(key);
@@ -833,6 +1013,8 @@ public class BitTiger100 {
 				cur.value = value;
 				return;
 			}
+			//if key is new, put it; 
+			//before that, check if list is full
 			if (map.size() == cap) {
 				// remove the head
 				map.remove(head.next.key);
@@ -848,6 +1030,194 @@ public class BitTiger100 {
 			tail.prev = newNode;
 		}
 	}
+	
+	//157. Read N Characters Given Read4 (string; buffer reading)
+	//https://www.youtube.com/watch?v=QihGE7m9ij0
+	public int read4(char[] temp) {
+		//copy 4 elements into temp
+		//return # of char copied
+		int index = 0;
+		return index;
+	}
+	
+    /**
+     * @param buf Destination buffer !!!
+     * @param n   Maximum number of characters to read
+     * @return    The number of characters read
+     */
+    public int read_callSingleTime(char[] buf, int n) {
+    	char[] temp = new char[4]; //Store our read chars from Read4
+    	int total = 0; //total reads so far
+    	
+    	while(total<n) {
+    		/*Read file and store characters in Temp. Count will store total chars read from Read4*/
+    		int count = read4(temp);
+    		
+    	    // get the actual count
+            /*Even if we read 4 chars from Read4, 
+            we don't want to exceed N and only want to read chars till N.*/
+    		count = Math.min(count, n-total);
+    		
+            //Transfer all the characters read from Read4 to our Destination buffer
+    		for(int i=0;i<count;i++) {
+    			buf[total] = temp[i];
+    			total++;
+    		}
+    		
+            //done. We can't read more characters.
+    		if(count<4) break;
+    	}
+		return total;
+    }
+	
+	//158. Read N Characters Given Read4 II - Call multiple times
+	/* The read4 API is defined in the parent class Reader4.
+    int read4(char[] buf); */
+	
+    /*
+    Basically, call multiple times means, you want to resume where you left off last time.
+    That means, if there are chars left in readChars 
+    (from the Read4 from the previous call of ReadN), 
+    you want to transfer them into buffer first.
+    */
+    
+    //used buffer pointer (buffPtr) and buffer Counter (buffCnt) 
+    //to store the data received in previous calls. 
+    //In the while loop, if buffPtr reaches current buffCnt, 
+    //it will be set as zero to be ready to read new data.
+    /**
+     * @param buf Destination buffer
+     * @param n   Maximum number of characters to read
+     * @return    The number of characters read
+     */
+    private int buffPtr=0;
+    private int buffCnt=0;
+    private char[] buff= new char[4];
+    public int read_callMultiTime(char[] buf, int n) {
+    	int ptr =0; // for buf 
+    	while(ptr<n) {
+            //no remaining characters in the temp
+    		if(buffPtr==0) {
+    			buffCnt = read4(buff);
+    		}
+    		// end of file
+    		if(buffCnt==0) break;
+            // copy from temp buffer to buf
+    		while(ptr<n && buffPtr<buffCnt) {
+    			buf[ptr++] = buff[buffPtr++];
+    		}
+    		// all chars in buff used up, set pointer to 0
+    		if(buffPtr>=buffCnt) {
+    			buffPtr=0;
+    		}
+    	}
+		return ptr;
+    }
+	
+	//159. Longest Substring with At Most Two Distinct Characters 
+	//(sliding window - two pointer - hashMap) O(n)
+	//method 1: HashMap 10ms 62% (better method use int[128] instead)
+    public int lengthOfLongestSubstringTwoDistinct(String s) {
+    	int len = s.length();
+        if(len <= 2) return len;
+        int maxSub = 0; int left = 0; int right = 0;
+        HashMap<Character, Integer> indxMap = new HashMap<>();
+        
+        while(right<len) {
+        	if(indxMap.size()<=2) {
+        		char cur = s.charAt(right);
+        		indxMap.put(cur, right); // update position || put new key in map
+        		right++;
+        	}
+        	if(indxMap.size()>2) { 
+        		int leftMost=len;
+        		//traverse through the map to find the character with the left most index,
+        		//and remove it from map
+        		for(int pos : indxMap.values()) {
+        			leftMost = Math.min(leftMost, pos);
+        		}
+        		char key = s.charAt(leftMost);
+        		indxMap.remove(key);
+        		left = leftMost+1;
+        	} 
+        	maxSub = Math.max(maxSub, right-left); //no +1 since right++ then put in next round
+        }
+        return maxSub;
+    }
+    
+    //151. Reverse Words in a String
+    // 8 ms: O(n2) waste time on split 
+    public String reverseWords(String s) {
+    	if(s.length() <1) return s;
+
+    	String[] str = s.split("\\s+");
+    	StringBuilder sb = new StringBuilder();
+    	for(int i=str.length-1; i>=0;i--) {
+    		sb.append(str[i]).append(" ");
+    	}
+		return sb.toString().trim();
+        
+    }
+    
+    //1ms : iterative O(n); use "lastIndexOf(int ch, int fromIndex)"
+    public String reverseWords2(String s) {
+    	int len = s.length();
+    	if(len <1) return s;
+    	StringBuilder sb = new StringBuilder();
+    	int index = len-1;
+    	while(index >=0) {
+    		// skip spaces
+    		if(s.charAt(index) == ' ') {
+    			index --;
+    			continue;
+    		}
+    		//find last word
+    		int start = s.lastIndexOf(' ', index) + 1;
+    		// add space
+    		sb.append(' ').append(s.substring(start, index+1));
+    		index = start -1;
+    		
+    	}
+    	
+        if(sb.length() > 0)sb.deleteCharAt(0);
+		return sb.toString();
+    }
+    
+    
+    
+    //173. Binary Search Tree Iterator
+    //Stack; In-order 
+    public class BSTIterator {
+    	
+    	Stack<TreeNode> stack = new Stack<TreeNode>();
+    	
+    	private void FillStack(TreeNode root) {
+    		while(root!=null) {
+    			stack.push(root);
+    			root = root.left;
+    		}
+    	}
+    	
+    	
+        public BSTIterator(TreeNode root) {
+        	FillStack(root);
+        }
+
+        /** @return whether we have a next smallest number */
+        // O(1) time and uses O(h) memory, where “h” is the height of the tree.
+        public boolean hasNext() {
+			return !stack.isEmpty();
+        }
+
+        /** @return the next smallest number */
+        public int next() {
+        	TreeNode rootCur = stack.pop();
+        	FillStack(rootCur.right);
+        	
+			return rootCur.val;
+        }
+    }
+
 	
 	//175 Combine Two Tables (In SQL)
 //	Select FirstName, LastName, City, State
@@ -883,5 +1253,13 @@ public class BitTiger100 {
 	    }
 	    return prev1;
 	}
+	
+	//176. Second Highest Salary
+//	select max(Salary) as SecondHighestSalary
+//	from Employee
+//	where Salary < (select max(Salary) from Employee) 
+	
+	//    //192. Word Frequency (bash script)
+//	cat words.txt | tr -s ' ' '\n' | sort | uniq -c | sort -r | awk '{print $2, $1}'
 
 }

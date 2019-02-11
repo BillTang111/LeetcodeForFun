@@ -29,6 +29,7 @@ public class SearchAndSort {
     }
     
     /** Sort b --put its elements in ascending order. O(n^2)*/
+    //	{{{select and swap the smallest to the front each time}}}
     public static void selectionSort(int[] b) {
         // {inv P: b[0..j-1] is sorted and b[0..j-1] <= b[j..]}, i.e.
         //          0---------------j--------------- b.length
@@ -61,6 +62,7 @@ public class SearchAndSort {
     }
     
     /** Sort b[h..k] --put its elements in ascending order. O(n^2)*/
+    //	{{{ add ('insert') a number to the sorted part and sort them each time}}}
     public static void insertionSort(int[] b, int h, int k) {
         // inv: h <= j <= k+1  and  b[h..j-1] is sorted
         //          h---------------j-------------k
@@ -132,6 +134,7 @@ public class SearchAndSort {
       return res+"]";
   }
     
+  //================================================
   /** Sort b[h..k]. O(nlogn)*/
   //method: divide and conquer
   public static void mergeSort(int[] b, int h, int k) {
@@ -161,5 +164,52 @@ public class SearchAndSort {
 		}
 	}
     
+    //=================================
+	//QuickSort Version 2: Middle element as pivot
+	//much clearer 
+    public static void quickSort2(int[] b, int h, int k) {
+    	//base case (only 1 element)
+    	if(k-h+1<2) return;
+    	//sort current array
+    	int j = partition2(b, h, k);
+    	//divide by recursion
+    	quickSort2(b, h, j-1);
+    	quickSort2(b, j+1, k);
+    }
+	
+    //make elements value between [0, leftBound] are all < pivot
+    // pivot ... left/small ... right/big ...
+    private static int partition2(int[] array, int left, int right){
+        int pivot = array[left];
+        int l = left + 1;
+        int r = right;
+        while(l<= r) {
+        	if(array[l] > pivot && array[r] < pivot) swap(array, l++, r++);
+            if(array[l] <= pivot) l++;
+            if(array[r] >= pivot) r--;
+        }
+        swap(array, left, r);
+        return r;
+    }
     
+    
+//    private static int partition2(int[] array, int left, int right){
+//        int pivotIndex = left + (right - left)/2;
+//        int pivot = array[pivotIndex];
+//        swap(array, pivotIndex, right);
+//
+//        int leftBound = left;
+//        int rightBound = right - 1;
+//        while(leftBound <= rightBound){
+//            if(array[leftBound] <= pivot){
+//                leftBound++;
+//            }else if(array[rightBound] >= pivot){
+//                rightBound--;
+//            }else{ // array[leftBound] > pivot || array[rightBound] < pivot
+//                swap(array, leftBound++, rightBound--);
+//            }
+//        }
+//        swap(array, leftBound, right);
+//        return leftBound;
+//    }
 }

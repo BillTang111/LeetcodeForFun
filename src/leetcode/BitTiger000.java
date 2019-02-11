@@ -37,7 +37,7 @@ public class BitTiger000 {
 	/**
 	 * 1. Two Sum use hash map (1 loops)
 	 */
-	public int[] twoSum(int[] nums, int target) {
+	public int[] twoSum2(int[] nums, int target) {
 		HashMap<Integer, Integer> map = new HashMap<>();
 
 		for (int i = 0; i < nums.length; i++) {
@@ -51,6 +51,21 @@ public class BitTiger000 {
 		}
 		throw new IllegalArgumentException("no such pair");
 	}
+	
+	//beat 100% 
+    public int[] twoSum(int[] nums, int target) {
+        HashMap<Integer, Integer> map = new HashMap<>();
+        int[] res = new int[2];
+        for(int i=0;i<nums.length;i++){
+            if(map.containsKey(target-nums[i])){
+                res[0]=map.get(target-nums[i]);
+                res[1]=i;
+                return res; 
+            }
+            map.put(nums[i], i);
+        }
+        return res;
+    }
 
 	/**
 	 * 2. Add Two Numbers Input: (2 -> 4 -> 3) + (5 -> 6 -> 4) Output: 7 -> 0 -> 8
@@ -226,6 +241,35 @@ public class BitTiger000 {
 		}
 		return res;
 	}
+	
+	//6. ZigZag Conversion (string buffer)
+    public String convert(String s, int numRows) {
+    	//Create nRows StringBuffers, 
+    	//and keep collecting characters from original string to corresponding StringBuffer.
+    	// 2 boundaries: number of rows; total number of chars
+    	char[] str = s.toCharArray();
+    	int len = str.length;
+    	StringBuffer[] rows = new StringBuffer[numRows];
+    	for(int i=0;i<numRows;i++) rows[i] = new StringBuffer(); 
+    	
+    	int index=0;
+    	while(index<len) {
+    		// vertically down
+    		for(int row=0; row<numRows && index<len; row++) {
+    			rows[row].append(str[index++]);
+    		}
+    		// obliquely up
+    		for(int row=numRows-2; row>=1 && index<len; row--) {
+    			rows[row].append(str[index++]);
+    		}
+    	}
+    	
+    	//append string buffer of rows
+    	for(int row=1; row<numRows; row++) {
+    		rows[0].append(rows[row]);
+    	}
+		return rows[0].toString();
+    }
 
 	// 7 Reverse Integer
 	public int reverse(int x) {
@@ -273,6 +317,30 @@ public class BitTiger000 {
 		}
 		return origin == revers;
 	}
+	
+	//8. String to Integer (atoi)
+	 public int myAtoi(String str) {
+	        int sign = 1, base = 0, i = 0, INT_MAX = Integer.MAX_VALUE, INT_MIN = Integer.MIN_VALUE;
+	        //remove while space
+	        while (i < str.length() && str.charAt(i) == ' ') i++;
+	        if (i >= str.length()) return 0;
+	        //sign
+	        if (str.charAt(i) == '+' || str.charAt(i) == '-') {
+	            if (str.charAt(i) == '-') sign = -1;
+	            i++;
+	        }
+	        //check each char
+	        while (i < str.length() && str.charAt(i) >= '0' && str.charAt(i) <= '9') {
+	        	//overflow
+	            if (base > INT_MAX / 10 || (base == INT_MAX / 10 && str.charAt(i) - '0' > 7)) {
+	                if (sign == -1) return INT_MIN;
+	                else            return INT_MAX;    
+	            }
+	            base = 10 * base + (str.charAt(i++) - '0');
+	        }
+	        return base * sign;
+	        
+	    }
 
 	// 10 regular expression matching (2D DP)
 	public boolean isMatch(String s, String p) {
@@ -417,7 +485,7 @@ public class BitTiger000 {
 	}
 
 	// main function
-	public List<List<Integer>> threeSum(int[] nums) {
+	public List<List<Integer>> threeSum1(int[] nums) {
 		ArrayList<List<Integer>> res = new ArrayList<List<Integer>>();
 		// sort first
 		Arrays.sort(nums);
@@ -449,19 +517,48 @@ public class BitTiger000 {
 		}
 		return res;
 	}
+	
+	//beats 90% (pick a point and use bi-directional 2 sums)
+    public List<List<Integer>> threeSum(int[] nums) {
+        Arrays.sort(nums); //to avoid duplication
+        int len = nums.length;
+        List<List<Integer>> res = new ArrayList<>();
+        
+        for(int pointer=0; pointer<len-2; pointer++){          
+            //skip duplicate in 3 sums pointer search
+            if(pointer==0 || nums[pointer] != nums[pointer-1]){
+                int target = 0 - nums[pointer];
+                int l=pointer+1, r= len-1;
+                while(l<r){
+                    if(nums[l]+nums[r]==target){
+                        //find one, great, add it
+                        res.add(Arrays.asList(nums[pointer],nums[l],nums[r]));
+
+                        //skip duplicates in 2 sums search
+                        while(l<r && nums[l]==nums[l+1]) l++;
+                        while(l<r && nums[r]==nums[r-1]) r--;
+                        l++; r--; //now, continue searching
+                    }else if(nums[l]+nums[r]<target){
+                        l++;
+                    }else{
+                        r--;
+                    }
+                }
+            }
+
+        }
+        return res;
+    }
 
 	/**
-	 * 17. Letter Combinations of a Phone Number FIFO queue: remove the top +
-	 * addLast
+	 * 17. Letter Combinations of a Phone Number 
+	 * 	FIFO queue: remove the top + addLast (2ms)
+	 * 
 	 */
-	public List<String> letterCombinations(String digits) {
-
+	public List<String> letterCombinations1(String digits) {
 		LinkedList<String> result = new LinkedList<String>();
 		// base case:
-		if (digits.isEmpty()) {
-			return result;
-		}
-
+		if (digits.isEmpty()) return result;
 		result.add(""); // result = [""] which is not null
 		// a mapping eg. "2" -> "abc"
 		String[] mapping = new String[] { "0", "1", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz" };
@@ -475,6 +572,29 @@ public class BitTiger000 {
 		}
 		return result;
 	}
+	
+	//method 2: backtracking (1ms)
+	public List<String> letterCombinations(String digits) {
+		String[] dict = new String[] { "", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz" };
+		List<String> result = new LinkedList<String>();
+		if (digits==null || digits.length()==0) return result;
+		letterCombinations_dft( digits,  dict, result, 0, "");
+		return result;
+	}
+	
+	private void letterCombinations_dft(String digits, String[] dict, List<String> res, int dig_idx, String temp){
+		//base case 
+		if(dig_idx == digits.length()) {
+			res.add(temp);
+			return;
+		}
+		//process current digit
+		int cur_digit = digits.charAt(dig_idx) - '0';
+		String lettersOfDigit = dict[cur_digit];
+		for(int i=0; i<lettersOfDigit.length(); i++) {
+			letterCombinations_dft( digits,  dict, res, dig_idx+1, temp+lettersOfDigit.charAt(i));
+		}
+	} 
 
 	/**
 	 * 20. Valid Parentheses Given a string containing just the characters '(', ')',
@@ -581,6 +701,39 @@ public class BitTiger000 {
 			backTrack(res, str + ")", left, right - 1);
 		}
 	}
+	
+	//25. Reverse Nodes in k-Group （ -- see Youtube）
+	//method 1: stack with O(k) space; method 2: pointers with space O(1)
+    public ListNode reverseKGroup(ListNode head, int k) {
+    	if(head == null) return null;
+    	ListNode dummy = new ListNode(0);
+    	dummy.next = head;
+    	ListNode prev = dummy;
+    	
+    	while(prev != null) {
+    		prev = reverse(prev, k);
+    	}
+    	
+		return dummy.next;
+    }
+    
+    private ListNode reverse(ListNode prev, int k) {
+    	ListNode last = prev;
+    	for(int i=0; i<=k; i++) {
+    		last = last.next;
+    		if(last == null && i!=k) return null;
+    	}
+    	ListNode start = prev.next;
+    	ListNode curr = prev.next.next;
+    	while(curr!=last) {
+    		ListNode next = curr.next;
+    		curr.next = prev.next;
+    		prev.next = curr;
+    		start.next = next;
+    		curr = next;
+    	}
+    	return start;
+    }
 
 	/**
 	 * 29. Divide Two Integers Input: dividend = 10, divisor = 3, Output: 3
@@ -704,6 +857,32 @@ public class BitTiger000 {
 			return right;
 		return -1;
 	}
+	
+	//35. Search Insert Position (binary search)
+	//https://www.youtube.com/watch?v=xSs-R1onSpc
+    public int searchInsert(int[] nums, int target) {
+    	if(nums==null || nums.length==0) return 0;
+    	int start=0, end = nums.length-1;
+    	//binary search
+    	while(start+1<end) {
+    		int mid = start + (end-start)/2;
+    		if(nums[mid]<target) {
+    			start = mid;
+    		}else if (nums[mid]>target) {
+    			end = mid;
+    		}else {
+    			return mid;
+    		}
+    	}
+    	//3 cases
+    	if(target <= nums[start]) {
+    		return start;
+    	}else if(target > nums[end]) {
+    		return end+1;
+    	}else {
+    		return end;
+    	}   
+    }
 
 	/**
 	 * 38. Count and Say Brute force: 2 for loops USE: Class StringBuilder
@@ -976,44 +1155,9 @@ public class BitTiger000 {
 			}
 		}
 	}
+	
+	
 
-	/**
-	 * 131. Palindrome Partitioning Given a string s, partition s such that every
-	 * substring of the partition is a palindrome.
-	 */
-	public List<List<String>> partition(String s) {
-		List<List<String>> result = new ArrayList<>();
-		// base case
-		if (s == null || s.length() == 0)
-			return result;
-		// general case
-		backTrack_partition(s, result, new ArrayList<String>(), 0);
-		return result;
-	}
-
-	// check and partition s[index, s.length)
-	private void backTrack_partition(String s, List<List<String>> result, List<String> curLst, int index) {
-		if (index >= s.length()) {
-			result.add(new ArrayList<String>(curLst));
-			return;
-		}
-		for (int i = index; i < s.length(); i++) {
-			if (isPalindrome(s, index, i)) {
-				curLst.add(s.substring(index, i + 1));
-				backTrack_partition(s, result, curLst, i + 1); // NOTE:i+1 not index+1 (recursion in depth)
-				curLst.remove(curLst.size() - 1);
-			}
-		}
-	}
-
-	// check if a string is a Palindrome for s[left, right]
-	private boolean isPalindrome(String s, int left, int right) {
-		while (left < right) {
-			if (s.charAt(left++) != s.charAt(right--))
-				return false;
-		}
-		return true;
-	}
 
 	/**
 	 * 41. First Missing Positive Given an unsorted integer array, find the smallest
@@ -1128,6 +1272,41 @@ public class BitTiger000 {
 
 		return min_drops[iPhone][floor];
 	}
+	
+	//50. Pow(x, n)
+    public double myPow(double x, int n) {
+    	if(n < 0) {
+    		n *= -1;
+    		x = 1/x;
+    	}
+		return myPow_help( x, n);
+    }
+    
+    public double myPow_help(double x, int n) {
+    	
+    	if(n == 0) return 1;
+    	
+		return (n%2 == 0) ? myPow_help(x*x, n/2) : x*myPow_help(x*x, n/2);
+    }
+    
+    //method 2: iterative 
+    public double myPow2(double x, int n) {
+        long N = n; // prevent overflow when n is integer.min
+        if (N < 0) {
+            x = 1 / x;
+            N = -N;
+        }
+        
+        double ans = 1;
+        double product = x;
+        for (long i = N; i > 0; i /= 2) {
+            if ((i % 2) == 1) {
+                ans = ans * product;
+            }
+            product = product * product;
+        }
+        return ans;
+    }
 
 	/*
 	 * 53. Maximum Subarray DP: For the current entry, add previous sum or not
@@ -1239,7 +1418,7 @@ public class BitTiger000 {
 	/**
 	 * https://segmentfault.com/a/1190000006121957 Version 1: backtracking O(2^n)
 	 * 
-	 * @param nums
+	 * @param numsLst
 	 * @return
 	 */
 	// a recursive helper function
@@ -1268,7 +1447,7 @@ public class BitTiger000 {
 	 * Good, Bad, Unkonwn for current index
 	 * https://leetcode.com/problems/jump-game/solution/
 	 * 
-	 * @param nums
+	 * @param numsLst
 	 * @return
 	 */
 	// enables for a variable to be a set of predefined constants
@@ -1413,6 +1592,63 @@ public class BitTiger000 {
     	}
     	return new ArrayList<List<String>> (map.values()); //this is new 
     }
+    
+    //51. N-Queens (hard backtracking)
+    public List<List<String>> solveNQueens(int n) {
+    	List<List<String>> res = new ArrayList<>();
+    	if(n<=0) return res;
+    	dfs_solveNQueens(res, new int[n], 0);
+		return res;
+    }
+    
+    //backtrack to fill out result list 
+    // queens: put queen in which column in ith row
+    private void dfs_solveNQueens( List<List<String>> res, int[] queens, int row) {
+    	if(row == queens.length) {
+    		addSolution(res, queens);
+    		return; 
+    	}
+    	//backtracking each possible column in current row
+    	for(int col=0; col<queens.length;col++) {
+    		queens[row] = col;
+    		if(isValid_solveNQueens(queens, row)) {
+    			dfs_solveNQueens( res, queens, row+1);
+    		}
+    	}
+    }
+    
+    private boolean isValid_solveNQueens(int[] queens, int row) {
+    	//note: one queen in a row was auto guaranteed
+    	//only one queen in a column
+    	for(int i=0; i<row;i++) {
+    		if(queens[i] == queens[row]) {
+    			return false;
+    		} //only one queen on its diagonal
+        	//如果两点的行之差(绝对值)等于列之差(绝对值) 那两点就在同一对角线上﻿
+    		else if(Math.abs(queens[i] - queens[row]) == Math.abs(i-row)) {
+    			return false;
+    		}
+    	}
+    	return true;
+    }
+    
+    private void addSolution(List<List<String>> res, int[] queens) {
+    	List<String> lst = new ArrayList<>();
+
+    	int len = queens.length;
+    	for(int i=0; i<len; i++) {
+        	StringBuilder sb = new StringBuilder();
+    		for(int j=0; j<len; j++) {
+    			if(queens[i]==j) {
+    				sb.append("Q");
+    			}else {
+    				sb.append(".");
+    			}
+    		}
+    		lst.add(sb.toString());
+    	}
+    	res.add(lst);
+    }
 
 	/**
 	 * 56. Merge Intervals (two pointers) sort then merge
@@ -1457,37 +1693,112 @@ public class BitTiger000 {
 	}
 
 	/**
-	 * 62. Unique Paths (DP)
+	 * 62. Unique Paths (DP along with 63, 64)
 	 */
 	public int uniquePaths(int m, int n) {
 		// base case: with this, 1ms -> 0ms
-		if (m == 0 || n == 0) {
-			return 0;
-		}
-
-		if (m == 1 || n == 1) {
-			return 1;
-		}
+		if (m == 0 || n == 0) return 0;
+		if (m == 1 || n == 1) return 1;
 
 		// general case
-		int[][] Path = new int[m][n];
+		int[][] path = new int[m][n]; //number of ways to reach (m,n)
 
+		//base case of induction
 		for (int i = 0; i < m; i++) {
-			Path[i][0] = 1; // only 1 way
+			path[i][0] = 1; // only 1 way
 		}
 
 		for (int j = 0; j < n; j++) {
-			Path[0][j] = 1;
+			path[0][j] = 1;
 		}
 
 		for (int i = 1; i < m; i++) {
 			for (int j = 1; j < n; j++) {
-				Path[i][j] = Path[i - 1][j] + Path[i][j - 1];
+				path[i][j] = path[i - 1][j] + path[i][j - 1];
 			}
 		}
 
-		return Path[m - 1][n - 1];
+		return path[m - 1][n - 1];
 	}
+	
+	//63. Unique Paths II (DP)
+    public int uniquePathsWithObstacles(int[][] obstacleGrid) {
+        if(obstacleGrid == null) return 0;
+        int m = obstacleGrid.length;
+        int n = obstacleGrid[0].length;
+        
+        int[][] path = new int[m][n]; //number of ways to reach (m,n)
+        //special care for base case
+        path[0][0] = obstacleGrid[0][0]==0 ? 1:0;
+        if(path[0][0] == 0) return 0;
+        
+        for (int i = 0; i < m; i++) {
+			for (int j = 0; j < n; j++) {
+                if(obstacleGrid[i][j] == 1){
+                    path[i][j] = 0;
+                }else if(i==0){ //base case
+                    if(j>0){
+                        path[i][j] = path[i][j-1]; 
+                    }
+                }else if(j==0){ //base case
+                    if(i>0){
+                        path[i][j] = path[i-1][j];
+                    }
+                }else{
+                    path[i][j] = path[i - 1][j] + path[i][j - 1];
+                }
+			}
+		}
+        return path[m-1][n-1];
+    }
+    
+    //64. Minimum Path Sum
+    public int minPathSum(int[][] grid) {
+        int sum=0;
+        if(grid == null || grid.length == 0 || grid[0].length == 0){
+            return 0;
+        }
+        
+        int lenx= grid.length;
+        int leny = grid[0].length;
+        
+        int[][] table = new int[lenx][leny];
+        table[0][0] = grid[0][0];
+        
+        for(int i=0; i<lenx; i++){
+            for(int j=0; j<leny; j++){
+               if(i==0){
+                   if(j>0){
+                        table[i][j] = table[i][j-1] + grid[i][j];
+                   } 
+               }else if(j==0){
+                   if(i>0){
+                       table[i][j] = table[i-1][j] + grid[i][j];
+                   }
+               }else{
+                   table[i][j] = Math.min(table[i-1][j], table[i][j-1]) + grid[i][j];
+               }
+            }
+        }
+        return table[lenx-1][leny-1];
+    }
+	
+	//67. Add Binary
+    public String addBinary(String a, String b) {
+    	int indx1 = a.length()-1;
+    	int indx2 = b.length()-1;
+    	int carry = 0; 
+    	StringBuilder sb = new StringBuilder();
+    	while(indx1>=0 || indx2>=0) {
+    		int sum = carry;
+    		if(indx1>=0) sum += a.charAt(indx1--) - '0';
+    		if(indx2>=0) sum += b.charAt(indx2--) - '0';
+    		sb.append(sum%2);
+    		carry = sum / 2;
+    	}
+    	if(carry!=0) sb.append(carry);
+		return sb.reverse().toString();
+    }
 
 	/**
 	 * 70. Climbing Stairs
@@ -1531,7 +1842,9 @@ public class BitTiger000 {
 	}
 
 	/**
-	 * 72. Edit Distance
+	 * 72. Edit Distance （经典 DP）
+	 * 花花这个 DP 讲的好！（DP 的核心是 recursion）
+	 * https://www.youtube.com/watch?v=Q4i_rqON2-E
 	 **/
 	public int minDistance(String word1, String word2) {
 		int m = word1.length(), n = word2.length();
@@ -1561,6 +1874,39 @@ public class BitTiger000 {
 		}
 		return dp[m][n];
 	}
+	
+	//6ms 78%
+    public int minDistance1(String word1, String word2) {
+        char[] w1 = word1.toCharArray();
+        char[] w2 = word2.toCharArray();
+        int len1 = w1.length;
+        int len2 = w2.length;
+        if(len1==0){
+            return len2; //insert
+        }else if(len2==0){
+            return len1; //delete
+        }
+        
+        int[][] dp = new int[len1+1][len2+1];
+        for(int i=0; i<=len1; i++){
+            for(int j=0; j<=len2; j++){
+                if(i==0){
+                    dp[i][j] = j;
+                    continue;
+                }else if(j==0){
+                    dp[i][j] = i;
+                    continue;
+                }
+                
+                if(w1[i-1]==w2[j-1]){
+                    dp[i][j] = dp[i-1][j-1];
+                }else{
+                    dp[i][j] = 1 + Math.min(dp[i-1][j],Math.min(dp[i][j-1],dp[i - 1][j - 1]));
+                }
+            }
+        }
+        return dp[len1][len2];
+    }
 
 	/**
 	 * 76. Minimum Window Substring GOOD summary of "sub-string" / "two pointer"
@@ -1608,11 +1954,39 @@ public class BitTiger000 {
 		// find s in t or not
 		return head + minLength > sArr.length ? "" : s.substring(head, head + minLength);
 	}
+	
+	//79. Word Search
+    public boolean exist(char[][] board, String word) {
+    	
+    	for(int i=0;i<board.length;i++) {
+    		for(int j=0;j<board[i].length;j++) {
+    			if(exist_dfs(board, word, 0, i, j)) return true;
+    		}
+    	}
+		return false;
+    }
+    
+    public boolean exist_dfs(char[][] board, String word, int wordIndx, int x, int y) {
+    	//base cases
+    	if(wordIndx == word.length()) return true;
+    	if(x<0 || x>board.length-1 || y<0 || y>board[x].length-1 || board[x][y]!=word.charAt(wordIndx))
+    		return false;
+    	board[x][y] = '*'; // prevent re-visiting this point
+    	boolean exist = 
+    			exist_dfs(board, word, wordIndx+1, x-1, y) ||
+    			exist_dfs(board, word, wordIndx+1, x+1, y) ||
+    			exist_dfs(board, word, wordIndx+1, x, y-1) ||
+    			exist_dfs(board, word, wordIndx+1, x, y+1);
+
+        board[x][y] = word.charAt(wordIndx); 
+		return exist;
+        
+    }
 
 	/***
 	 * 84. Largest Rectangle in Histogram Given n non-negative integers representing
 	 * the histogram's bar height where the width of each bar is 1, find the area of
-	 * largest rectangle in the histogram.
+	 * largest rectangle in the histogram. O(n) (Stack )
 	 * https://www.youtube.com/watch?v=KkJrGxuQtYo
 	 */
 	public int largestRectangleArea(int[] heights) {
@@ -1625,10 +1999,10 @@ public class BitTiger000 {
 		for (int i = 0; i < heights.length; i++) {
 			// pop when current height decreases (right boundary is found)
 			while (!stack.isEmpty() && heights[i] < heights[stack.peek()]) {
-				int pos = stack.pop();
+				int right = i;
+				int pos = stack.pop();  int height = heights[pos];
 				int left = stack.isEmpty() ? -1 : stack.peek();
-				int height = heights[pos];
-				largestRec = Math.max(height * (i - left - 1), largestRec); // "i" is the current right position
+				largestRec = Math.max(largestRec, height * (right - left - 1) ); // "i" is the current right position
 			}
 			// push everyone onto stack
 			stack.push(i);
@@ -1637,24 +2011,36 @@ public class BitTiger000 {
 		// deal with the final ones
 		while (!stack.isEmpty()) {
 			int right = heights.length;
-			int pos = stack.pop();
+			int pos = stack.pop();  int height = heights[pos];
 			int left = stack.isEmpty() ? -1 : stack.peek();
-			largestRec = Math.max(largestRec, heights[pos] * (right - left - 1));
+			largestRec = Math.max(largestRec, height * (right - left - 1));
 		}
 		return largestRec;
 	}
-
-	/***
-	 * 89. Gray Code Given a non-negative integer n representing the total number of
-	 * bits in the code, print the sequence of gray code.
-	 */
-	public List<Integer> grayCode(int n) {
-		List<Integer> res = new ArrayList<Integer>();
-		for (int i = 0; i < 1 << n; i++) {
-			res.add(i ^ i >> 1);
-		}
-		return res;
-	}
+	
+	//85. Maximal Rectangle
+	//Method 1: convert to 84; see YouTube (42% - 33ms)
+    public int maximalRectangle(char[][] matrix) {
+    	if(matrix == null || matrix.length==0 || matrix[0].length ==0) return 0;
+    	int row = matrix.length;
+    	int col = matrix[0].length;
+    	int[] heights = new int[col];
+    	int maxHeight = 0;
+    	for(int i=0; i<row; i++) { //for each row
+        	for(int j=0; j<col; j++) {
+        		if(matrix[i][j]=='1') {
+        			heights[j]++;
+        		}else {
+        			heights[j]=0;
+        		}
+        	}
+    		 maxHeight = Math.max(maxHeight, largestRectangleArea(heights));
+    	}
+    	return maxHeight;
+    }
+    
+	//Method 2: DP 7ms - 97%
+	
 	
 	//88. Merge sorted array
 	//Given two sorted integer arrays nums1 and nums2, merge nums2 into nums1 as one sorted array.
@@ -1678,6 +2064,18 @@ public class BitTiger000 {
     	}
     }
 
+	/***
+	 * 89. Gray Code Given a non-negative integer n representing the total number of
+	 * bits in the code, print the sequence of gray code.
+	 */
+	public List<Integer> grayCode(int n) {
+		List<Integer> res = new ArrayList<Integer>();
+		for (int i = 0; i < 1 << n; i++) {
+			res.add(i ^ i >> 1);
+		}
+		return res;
+	}
+    
 	/***
 	 * 91. Decode Ways (DP) Given a non-empty string containing only digits,
 	 * determine the total number of ways to decode it.
